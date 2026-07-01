@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Local Storage Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; }
+    button { margin-right: 8px; padding: 8px 12px; }
+    pre { background: #f5f5f5; padding: 12px; white-space: pre-wrap; word-break: break-word; }
+  </style>
+</head>
+<body>
+  <h1>Local Storage Test</h1>
+
+  <button id="save-data-button" type="button">Save data.js to local storage</button>
+  <button id="read-data-button" type="button">Read local storage and display</button>
+  <button id="clear-data-button" type="button">Clear local storage</button>
+  <button id="task-template-button" type="button">Return task_template only</button>
+  <input id="date-picker" type="date" />
+  <button id="save-date-button" type="button">Save Date</button>
+  <button id="read-date-button" type="button">Read Date</button>
+  <button id="check-daily-trigger-button" type="button">Check Daily Trigger</button>
+  <input id="task-name-input" type="text" placeholder="Task name" />
+  <button id="add-task-button" type="button">Add Task to Todo</button>
+  <button id="add-template-button" type="button">Add Template</button>
+  <button id="delete-task-button" type="button">Delete Task</button>
+  <button id="delete-template-button" type="button">Delete Template</button>
+  <button id="download-data-button" type="button">Download local storage as data.js</button>
+
+  <p id="status">No action taken yet.</p>
+  <pre id="output"></pre>
+    <div>
+        <input type="radio" name="recuring" value="Yearly" onclick="recuring_click(this.value)" />Yearly<br>
+        <input type="radio" name="recuring" value="Monthly" onclick="recuring_click(this.value)" />Monthly<br>
+        <input type="radio" name="recuring" value="Weekly" onclick="recuring_click(this.value)" />Weekly<br>
+        <input type="radio" name="recuring" value="DaysInterval" onclick="recuring_click(this.value)" checked/>Days Interval
+        <br>
+        <input type="button" onclick="step_left()" style="width:50px;" value="<" />
+        <span id="interval" title="0" style="width:200px;">0</span>
+        <input type="button" onclick="step_right()" style="width:50px;" value=">" />
+        <br>
+        <input id="interval_range" type="range" min="0" max="7" value="0" style="width:400px;" oninput=slider_move(); />
+
+
+        <script>
+            interval = document.getElementById('interval');
+            interval_range = document.getElementById('interval_range');
+            var dict
+            var Weekly = [
+                [1, "Sunday"],
+                [2, "Monday"],
+                [3, "Tusday"],
+                [4, "Wednesday"],
+                [5, "Thursday"],
+                [6, "Friday"],
+                [7, "Sartuday"]
+            ];
+            var Monthly = [
+                [1, "1"],
+                [2, "2"],
+                [3, "3"],
+                [4, "4"],
+                [5, "5"],
+                [6, "6"],
+                [7, "7"],
+                [8, "8"],
+                [9, "9"],
+                [10, "10"],
+                [11, "11"],
+                [12, "12"],
+                [13, "13"],
+                [14, "14"],
+                [15, "15"],
+                [16, "16"],
+                [17, "17"],
+                [18, "18"],
+                [19, "19"],
+                [20, "20"],
+                [21, "21"],
+                [22, "22"],
+                [23, "23"],
+                [24, "24"],
+                [25, "25"],
+                [26, "26"],
+                [27, "27"],
+                [28, "28"]
+            ];
+            var Yearly = [
+                [101, "Jan 1"],
+                [102, "Jan 2"],
+                [103, "Jan 3"],
+                [104, "Jan 4"],
+                [105, "Jan 5"],
+                [106, "Jan 6"],
+                [107, "Jan 7"],
+                [108, "Jan 8"],
+                [109, "Jan 9"],
+                [110, "Jan 10"],
+                [111, "Jan 11"],
+                [112, "Jan 12"],
+                [113, "Jan 13"],
+                [114, "Jan 14"],
+                [115, "Jan 15"],
+                [116, "Jan 16"],
+                [117, "Jan 17"],
+                [118, "Jan 18"],
+                [119, "Jan 19"],
+                [120, "Jan 20"],
+                [121, "Jan 21"],
+                [122, "Jan 22"],
+                [123, "Jan 23"],
+                [124, "Jan 24"],
+                [125, "Jan 25"],
+                [126, "Jan 26"],
+                [127, "Jan 27"],
+                [128, "Jan 28"],
+                [129, "Jan 29"],
+                [130, "Jan 30"],
+                [131, "Jan 31"],
+                [201, "Feb 1"],
+                [202, "Feb 2"],
+                [203, "Feb 3"],
+                [204, "Feb 4"],
+                [205, "Feb 5"],
+                [206, "Feb 6"],
+                [207, "Feb 7"],
+                [208, "Feb 8"],
+                [209, "Feb 9"],
+                [210, "Feb 10"],
+                [211, "Feb 11"],
+                [212, "Feb 12"],
+                [213, "Feb 13"],
+                [214, "Feb 14"],
+                [215, "Feb 15"],
+                [216, "Feb 16"],
+                [217, "Feb 17"],
+                [218, "Feb 18"],
+                [219, "Feb 19"],
+                [220, "Feb 20"],
+                [221, "Feb 21"],
+                [222, "Feb 22"],
+                [223, "Feb 23"],
+                [224, "Feb 24"],
+                [225, "Feb 25"],
+                [226, "Feb 26"],
+                [227, "Feb 27"],
+                [228, "Feb 28"],
+                [301, "Mar 1"],
+                [302, "Mar 2"],
+                [303, "Mar 3"],
+                [304, "Mar 4"],
+                [305, "Mar 5"],
+                [306, "Mar 6"],
+                [307, "Mar 7"],
+                [308, "Mar 8"],
+                [309, "Mar 9"],
+                [310, "Mar 10"],
+                [311, "Mar 11"],
+                [312, "Mar 12"],
+                [313, "Mar 13"],
+                [314, "Mar 14"],
+                [315, "Mar 15"],
+                [316, "Mar 16"],
+                [317, "Mar 17"],
+                [318, "Mar 18"],
+                [319, "Mar 19"],
+                [320, "Mar 20"],
+                [321, "Mar 21"],
+                [322, "Mar 22"],
+                [323, "Mar 23"],
+                [324, "Mar 24"],
+                [325, "Mar 25"],
+                [326, "Mar 26"],
+                [327, "Mar 27"],
+                [328, "Mar 28"],
+                [329, "Mar 29"],
+                [330, "Mar 30"],
+                [331, "Mar 31"],
+                [401, "Apr 1"],
+                [402, "Apr 2"],
+                [403, "Apr 3"],
+                [404, "Apr 4"],
+                [405, "Apr 5"],
+                [406, "Apr 6"],
+                [407, "Apr 7"],
+                [408, "Apr 8"],
+                [409, "Apr 9"],
+                [410, "Apr 10"],
+                [411, "Apr 11"],
+                [412, "Apr 12"],
+                [413, "Apr 13"],
+                [414, "Apr 14"],
+                [415, "Apr 15"],
+                [416, "Apr 16"],
+                [417, "Apr 17"],
+                [418, "Apr 18"],
+                [419, "Apr 19"],
+                [420, "Apr 20"],
+                [421, "Apr 21"],
+                [422, "Apr 22"],
+                [423, "Apr 23"],
+                [424, "Apr 24"],
+                [425, "Apr 25"],
+                [426, "Apr 26"],
+                [427, "Apr 27"],
+                [428, "Apr 28"],
+                [429, "Apr 29"],
+                [430, "Apr 30"],
+                [501, "May 1"],
+                [502, "May 2"],
+                [503, "May 3"],
+                [504, "May 4"],
+                [505, "May 5"],
+                [506, "May 6"],
+                [507, "May 7"],
+                [508, "May 8"],
+                [509, "May 9"],
+                [510, "May 10"],
+                [511, "May 11"],
+                [512, "May 12"],
+                [513, "May 13"],
+                [514, "May 14"],
+                [515, "May 15"],
+                [516, "May 16"],
+                [517, "May 17"],
+                [518, "May 18"],
+                [519, "May 19"],
+                [520, "May 20"],
+                [521, "May 21"],
+                [522, "May 22"],
+                [523, "May 23"],
+                [524, "May 24"],
+                [525, "May 25"],
+                [526, "May 26"],
+                [527, "May 27"],
+                [528, "May 28"],
+                [529, "May 29"],
+                [530, "May 30"],
+                [531, "May 31"],
+                [601, "Jun 1"],
+                [602, "Jun 2"],
+                [603, "Jun 3"],
+                [604, "Jun 4"],
+                [605, "Jun 5"],
+                [606, "Jun 6"],
+                [607, "Jun 7"],
+                [608, "Jun 8"],
+                [609, "Jun 9"],
+                [610, "Jun 10"],
+                [611, "Jun 11"],
+                [612, "Jun 12"],
+                [613, "Jun 13"],
+                [614, "Jun 14"],
+                [615, "Jun 15"],
+                [616, "Jun 16"],
+                [617, "Jun 17"],
+                [618, "Jun 18"],
+                [619, "Jun 19"],
+                [620, "Jun 20"],
+                [621, "Jun 21"],
+                [622, "Jun 22"],
+                [623, "Jun 23"],
+                [624, "Jun 24"],
+                [625, "Jun 25"],
+                [626, "Jun 26"],
+                [627, "Jun 27"],
+                [628, "Jun 28"],
+                [629, "Jun 29"],
+                [630, "Jun 30"],
+                [701, "Jul 1"],
+                [702, "Jul 2"],
+                [703, "Jul 3"],
+                [704, "Jul 4"],
+                [705, "Jul 5"],
+                [706, "Jul 6"],
+                [707, "Jul 7"],
+                [708, "Jul 8"],
+                [709, "Jul 9"],
+                [710, "Jul 10"],
+                [711, "Jul 11"],
+                [712, "Jul 12"],
+                [713, "Jul 13"],
+                [714, "Jul 14"],
+                [715, "Jul 15"],
+                [716, "Jul 16"],
+                [717, "Jul 17"],
+                [718, "Jul 18"],
+                [719, "Jul 19"],
+                [720, "Jul 20"],
+                [721, "Jul 21"],
+                [722, "Jul 22"],
+                [723, "Jul 23"],
+                [724, "Jul 24"],
+                [725, "Jul 25"],
+                [726, "Jul 26"],
+                [727, "Jul 27"],
+                [728, "Jul 28"],
+                [729, "Jul 29"],
+                [730, "Jul 30"],
+                [731, "Jul 31"],
+                [801, "Aug 1"],
+                [802, "Aug 2"],
+                [803, "Aug 3"],
+                [804, "Aug 4"],
+                [805, "Aug 5"],
+                [806, "Aug 6"],
+                [807, "Aug 7"],
+                [808, "Aug 8"],
+                [809, "Aug 9"],
+                [810, "Aug 10"],
+                [811, "Aug 11"],
+                [812, "Aug 12"],
+                [813, "Aug 13"],
+                [814, "Aug 14"],
+                [815, "Aug 15"],
+                [816, "Aug 16"],
+                [817, "Aug 17"],
+                [818, "Aug 18"],
+                [819, "Aug 19"],
+                [820, "Aug 20"],
+                [821, "Aug 21"],
+                [822, "Aug 22"],
+                [823, "Aug 23"],
+                [824, "Aug 24"],
+                [825, "Aug 25"],
+                [826, "Aug 26"],
+                [827, "Aug 27"],
+                [828, "Aug 28"],
+                [829, "Aug 29"],
+                [830, "Aug 30"],
+                [831, "Aug 31"],
+                [901, "Sep 1"],
+                [902, "Sep 2"],
+                [903, "Sep 3"],
+                [904, "Sep 4"],
+                [905, "Sep 5"],
+                [906, "Sep 6"],
+                [907, "Sep 7"],
+                [908, "Sep 8"],
+                [909, "Sep 9"],
+                [910, "Sep 10"],
+                [911, "Sep 11"],
+                [912, "Sep 12"],
+                [913, "Sep 13"],
+                [914, "Sep 14"],
+                [915, "Sep 15"],
+                [916, "Sep 16"],
+                [917, "Sep 17"],
+                [918, "Sep 18"],
+                [919, "Sep 19"],
+                [920, "Sep 20"],
+                [921, "Sep 21"],
+                [922, "Sep 22"],
+                [923, "Sep 23"],
+                [924, "Sep 24"],
+                [925, "Sep 25"],
+                [926, "Sep 26"],
+                [927, "Sep 27"],
+                [928, "Sep 28"],
+                [929, "Sep 29"],
+                [930, "Sep 30"],
+                [1001, "Oct 1"],
+                [1002, "Oct 2"],
+                [1003, "Oct 3"],
+                [1004, "Oct 4"],
+                [1005, "Oct 5"],
+                [1006, "Oct 6"],
+                [1007, "Oct 7"],
+                [1008, "Oct 8"],
+                [1009, "Oct 9"],
+                [1010, "Oct 10"],
+                [1011, "Oct 11"],
+                [1012, "Oct 12"],
+                [1013, "Oct 13"],
+                [1014, "Oct 14"],
+                [1015, "Oct 15"],
+                [1016, "Oct 16"],
+                [1017, "Oct 17"],
+                [1018, "Oct 18"],
+                [1019, "Oct 19"],
+                [1020, "Oct 20"],
+                [1021, "Oct 21"],
+                [1022, "Oct 22"],
+                [1023, "Oct 23"],
+                [1024, "Oct 24"],
+                [1025, "Oct 25"],
+                [1026, "Oct 26"],
+                [1027, "Oct 27"],
+                [1028, "Oct 28"],
+                [1029, "Oct 29"],
+                [1030, "Oct 30"],
+                [1031, "Oct 31"],
+                [1101, "Nov 1"],
+                [1102, "Nov 2"],
+                [1103, "Nov 3"],
+                [1104, "Nov 4"],
+                [1105, "Nov 5"],
+                [1106, "Nov 6"],
+                [1107, "Nov 7"],
+                [1108, "Nov 8"],
+                [1109, "Nov 9"],
+                [1110, "Nov 10"],
+                [1111, "Nov 11"],
+                [1112, "Nov 12"],
+                [1113, "Nov 13"],
+                [1114, "Nov 14"],
+                [1115, "Nov 15"],
+                [1116, "Nov 16"],
+                [1117, "Nov 17"],
+                [1118, "Nov 18"],
+                [1119, "Nov 19"],
+                [1120, "Nov 20"],
+                [1121, "Nov 21"],
+                [1122, "Nov 22"],
+                [1123, "Nov 23"],
+                [1124, "Nov 24"],
+                [1125, "Nov 25"],
+                [1126, "Nov 26"],
+                [1127, "Nov 27"],
+                [1128, "Nov 28"],
+                [1129, "Nov 29"],
+                [1130, "Nov 30"],
+                [1201, "Dec 1"],
+                [1202, "Dec 2"],
+                [1203, "Dec 3"],
+                [1204, "Dec 4"],
+                [1205, "Dec 5"],
+                [1206, "Dec 6"],
+                [1207, "Dec 7"],
+                [1208, "Dec 8"],
+                [1209, "Dec 9"],
+                [1210, "Dec 10"],
+                [1211, "Dec 11"],
+                [1212, "Dec 12"],
+                [1213, "Dec 13"],
+                [1214, "Dec 14"],
+                [1215, "Dec 15"],
+                [1216, "Dec 16"],
+                [1217, "Dec 17"],
+                [1218, "Dec 18"],
+                [1219, "Dec 19"],
+                [1220, "Dec 20"],
+                [1221, "Dec 21"],
+                [1222, "Dec 22"],
+                [1223, "Dec 23"],
+                [1224, "Dec 24"],
+                [1225, "Dec 25"],
+                [1226, "Dec 26"],
+                [1227, "Dec 27"],
+                [1228, "Dec 28"],
+                [1229, "Dec 29"],
+                [1230, "Dec 30"],
+                [1231, "Dec 31"]
+
+            ];
+            var DaysInterval = [
+                [1, "1"],
+                [2, "2"],
+                [3, "3"],
+                [4, "4"],
+                [5, "5"],
+                [6, "6"],
+                [7, "7"],
+                [8, "8"],
+                [9, "9"],
+                [10, "10"],
+                [11, "11"],
+                [12, "12"],
+                [13, "13"],
+                [14, "14"],
+                [15, "15"],
+                [16, "16"],
+                [17, "17"],
+                [18, "18"],
+                [19, "19"],
+                [20, "20"],
+                [21, "21"],
+                [22, "22"],
+                [23, "23"],
+                [24, "24"],
+                [25, "25"],
+                [26, "26"],
+                [27, "27"],
+                [28, "28"],
+                [29, "29"],
+                [30, "30"],
+                [31, "31"],
+                [32, "32"],
+                [33, "33"],
+                [34, "34"],
+                [35, "35"],
+                [36, "36"],
+                [37, "37"],
+                [38, "38"],
+                [39, "39"],
+                [40, "40"],
+                [41, "41"],
+                [42, "42"],
+                [43, "43"],
+                [44, "44"],
+                [45, "45"],
+                [46, "46"],
+                [47, "47"],
+                [48, "48"],
+                [49, "49"],
+                [50, "50"],
+                [51, "51"],
+                [52, "52"],
+                [53, "53"],
+                [54, "54"],
+                [55, "55"],
+                [56, "56"],
+                [57, "57"],
+                [58, "58"],
+                [59, "59"],
+                [60, "60"],
+                [61, "61"],
+                [62, "62"],
+                [63, "63"],
+                [64, "64"],
+                [65, "65"],
+                [66, "66"],
+                [67, "67"],
+                [68, "68"],
+                [69, "69"],
+                [70, "70"],
+                [71, "71"],
+                [72, "72"],
+                [73, "73"],
+                [74, "74"],
+                [75, "75"],
+                [76, "76"],
+                [77, "77"],
+                [78, "78"],
+                [79, "79"],
+                [80, "80"],
+                [81, "81"],
+                [82, "82"],
+                [83, "83"],
+                [84, "84"],
+                [85, "85"],
+                [86, "86"],
+                [87, "87"],
+                [88, "88"],
+                [89, "89"],
+                [90, "90"],
+                [91, "91"],
+                [92, "92"],
+                [93, "93"],
+                [94, "94"],
+                [95, "95"],
+                [96, "96"],
+                [97, "97"],
+                [98, "98"],
+                [99, "99"],
+                [100, "100"],
+                [101, "101"],
+                [102, "102"],
+                [103, "103"],
+                [104, "104"],
+                [105, "105"],
+                [106, "106"],
+                [107, "107"],
+                [108, "108"],
+                [109, "109"],
+                [110, "110"],
+                [111, "111"],
+                [112, "112"],
+                [113, "113"],
+                [114, "114"],
+                [115, "115"],
+                [116, "116"],
+                [117, "117"],
+                [118, "118"],
+                [119, "119"],
+                [120, "120"],
+                [121, "121"],
+                [122, "122"],
+                [123, "123"],
+                [124, "124"],
+                [125, "125"],
+                [126, "126"],
+                [127, "127"],
+                [128, "128"],
+                [129, "129"],
+                [130, "130"],
+                [131, "131"],
+                [132, "132"],
+                [133, "133"],
+                [134, "134"],
+                [135, "135"],
+                [136, "136"],
+                [137, "137"],
+                [138, "138"],
+                [139, "139"],
+                [140, "140"],
+                [141, "141"],
+                [142, "142"],
+                [143, "143"],
+                [144, "144"],
+                [145, "145"],
+                [146, "146"],
+                [147, "147"],
+                [148, "148"],
+                [149, "149"],
+                [150, "150"],
+                [151, "151"],
+                [152, "152"],
+                [153, "153"],
+                [154, "154"],
+                [155, "155"],
+                [156, "156"],
+                [157, "157"],
+                [158, "158"],
+                [159, "159"],
+                [160, "160"],
+                [161, "161"],
+                [162, "162"],
+                [163, "163"],
+                [164, "164"],
+                [165, "165"],
+                [166, "166"],
+                [167, "167"],
+                [168, "168"],
+                [169, "169"],
+                [170, "170"],
+                [171, "171"],
+                [172, "172"],
+                [173, "173"],
+                [174, "174"],
+                [175, "175"],
+                [176, "176"],
+                [177, "177"],
+                [178, "178"],
+                [179, "179"],
+                [180, "180"],
+                [181, "181"],
+                [182, "182"],
+                [183, "183"],
+                [184, "184"],
+                [185, "185"],
+                [186, "186"],
+                [187, "187"],
+                [188, "188"],
+                [189, "189"],
+                [190, "190"],
+                [191, "191"],
+                [192, "192"],
+                [193, "193"],
+                [194, "194"],
+                [195, "195"],
+                [196, "196"],
+                [197, "197"],
+                [198, "198"],
+                [199, "199"],
+                [200, "200"],
+                [201, "201"],
+                [202, "202"],
+                [203, "203"],
+                [204, "204"],
+                [205, "205"],
+                [206, "206"],
+                [207, "207"],
+                [208, "208"],
+                [209, "209"],
+                [210, "210"],
+                [211, "211"],
+                [212, "212"],
+                [213, "213"],
+                [214, "214"],
+                [215, "215"],
+                [216, "216"],
+                [217, "217"],
+                [218, "218"],
+                [219, "219"],
+                [220, "220"],
+                [221, "221"],
+                [222, "222"],
+                [223, "223"],
+                [224, "224"],
+                [225, "225"],
+                [226, "226"],
+                [227, "227"],
+                [228, "228"],
+                [229, "229"],
+                [230, "230"],
+                [231, "231"],
+                [232, "232"],
+                [233, "233"],
+                [234, "234"],
+                [235, "235"],
+                [236, "236"],
+                [237, "237"],
+                [238, "238"],
+                [239, "239"],
+                [240, "240"],
+                [241, "241"],
+                [242, "242"],
+                [243, "243"],
+                [244, "244"],
+                [245, "245"],
+                [246, "246"],
+                [247, "247"],
+                [248, "248"],
+                [249, "249"],
+                [250, "250"],
+                [251, "251"],
+                [252, "252"],
+                [253, "253"],
+                [254, "254"],
+                [255, "255"],
+                [256, "256"],
+                [257, "257"],
+                [258, "258"],
+                [259, "259"],
+                [260, "260"],
+                [261, "261"],
+                [262, "262"],
+                [263, "263"],
+                [264, "264"],
+                [265, "265"],
+                [266, "266"],
+                [267, "267"],
+                [268, "268"],
+                [269, "269"],
+                [270, "270"],
+                [271, "271"],
+                [272, "272"],
+                [273, "273"],
+                [274, "274"],
+                [275, "275"],
+                [276, "276"],
+                [277, "277"],
+                [278, "278"],
+                [279, "279"],
+                [280, "280"],
+                [281, "281"],
+                [282, "282"],
+                [283, "283"],
+                [284, "284"],
+                [285, "285"],
+                [286, "286"],
+                [287, "287"],
+                [288, "288"],
+                [289, "289"],
+                [290, "290"],
+                [291, "291"],
+                [292, "292"],
+                [293, "293"],
+                [294, "294"],
+                [295, "295"],
+                [296, "296"],
+                [297, "297"],
+                [298, "298"],
+                [299, "299"],
+                [300, "300"],
+                [301, "301"],
+                [302, "302"],
+                [303, "303"],
+                [304, "304"],
+                [305, "305"],
+                [306, "306"],
+                [307, "307"],
+                [308, "308"],
+                [309, "309"],
+                [310, "310"],
+                [311, "311"],
+                [312, "312"],
+                [313, "313"],
+                [314, "314"],
+                [315, "315"],
+                [316, "316"],
+                [317, "317"],
+                [318, "318"],
+                [319, "319"],
+                [320, "320"],
+                [321, "321"],
+                [322, "322"],
+                [323, "323"],
+                [324, "324"],
+                [325, "325"],
+                [326, "326"],
+                [327, "327"],
+                [328, "328"],
+                [329, "329"],
+                [330, "330"],
+                [331, "331"],
+                [332, "332"],
+                [333, "333"],
+                [334, "334"],
+                [335, "335"],
+                [336, "336"],
+                [337, "337"],
+                [338, "338"],
+                [339, "339"],
+                [340, "340"],
+                [341, "341"],
+                [342, "342"],
+                [343, "343"],
+                [344, "344"],
+                [345, "345"],
+                [346, "346"],
+                [347, "347"],
+                [348, "348"],
+                [349, "349"],
+                [350, "350"],
+                [351, "351"],
+                [352, "352"],
+                [353, "353"],
+                [354, "354"],
+                [355, "355"],
+                [356, "356"],
+                [357, "357"],
+                [358, "358"],
+                [359, "359"],
+                [360, "360"],
+                [361, "361"],
+                [362, "362"],
+                [363, "363"],
+                [364, "364"],
+                [365, "365"]
+            ];
+
+            dict = DaysInterval;
+
+            var values = [];
+            var min_position = 0;
+            var max_position = 0;
+            var position = 0;
+            recuring_click("DaysInterval");
+
+            function recuring_click(radio_value) {
+                //alert(radio_value);
+                if (radio_value == "Yearly") {dict = Yearly;}
+                else if (radio_value == "Monthly") { dict = Monthly; }
+                else if (radio_value == "Weekly") { dict = Weekly; }
+                else { dict = DaysInterval; };
+                max_position = dict.length - 1;
+                interval_range.max = max_position;
+                interval_range.value = Math.floor(max_position / 2);
+                position = interval_range.value;
+                move();
+            }
+
+            function slider_move() {
+                position = interval_range.value;
+                move();
+            }
+
+            function step_left() {
+                position--;
+                interval_range.value = position;
+                move();
+            }
+            function step_right() {
+                position++;
+                interval_range.value = position;
+                move();
+
+            }
+
+            function move() {
+                if (position < min_position) (position = min_position);
+                if (position > max_position) (position = max_position);
+                values = dict[position];
+                interval.innerText = values[1];
+            }
+
+        </script>
+    </div>
+  <script src="data.js"></script>
+  <script src="data_access.js"></script>
+  <script>
+    function updateView(statusMessage, outputValue) {
+      const statusEl = document.getElementById('status');
+      const outputEl = document.getElementById('output');
+      if (statusEl) {
+        statusEl.textContent = statusMessage;
+      }
+      if (outputEl) {
+        outputEl.textContent = typeof outputValue === 'string' ? outputValue : JSON.stringify(outputValue, null, 2);
+      }
+    }
+
+    function handleSave() {
+      try {
+        window.saveDataToLocalStorage();
+        updateView('Saved data.js to localStorage under key "db".', 'Stored successfully.');
+      } catch (error) {
+        updateView('Error: ' + error.message, '');
+      }
+    }
+
+    function handleLoad() {
+      try {
+        const stored = window.loadFromLocalStorage();
+        if (stored === null) {
+          updateView('Nothing stored yet.', 'No data found in localStorage.');
+          return;
+        }
+
+        updateView('Loaded data from localStorage.', stored);
+      } catch (error) {
+        updateView('Error reading stored data: ' + error.message, '');
+      }
+    }
+
+    function handleClear() {
+      try {
+        window.clearLocalStorage();
+        updateView('Cleared localStorage entry for key "db".', 'Local storage cleared.');
+      } catch (error) {
+        updateView('Error clearing storage: ' + error.message, '');
+      }
+    }
+
+    function handleTaskTemplateOnly() {
+      try {
+        const taskTemplateList = window.getTaskTemplateOnly();
+        updateView('Returned task_template entries from local storage.', taskTemplateList);
+      } catch (error) {
+        updateView('Error reading task_template: ' + error.message, '');
+      }
+    }
+
+    function handleSaveDate() {
+      try {
+        const datePicker = document.getElementById('date-picker');
+        if (!datePicker || !datePicker.value) {
+          updateView('Please select a date.', '');
+          return;
+        }
+
+        const result = window.saveDateToLocalStorage(datePicker.value);
+        updateView('Saved CURDATE to local storage.', result);
+      } catch (error) {
+        updateView('Error saving date: ' + error.message, '');
+      }
+    }
+
+    function handleReadDate() {
+      try {
+        const dateValue = window.readDateFromLocalStorage();
+        if (!dateValue) {
+          updateView('No CURDATE found.', '');
+          return;
+        }
+
+        const datePicker = document.getElementById('date-picker');
+        if (datePicker) {
+          datePicker.value = dateValue;
+        }
+        updateView('Read CURDATE from local storage.', { CURDATE: dateValue });
+      } catch (error) {
+        updateView('Error reading date: ' + error.message, '');
+      }
+    }
+
+    function handleCheckDailyTrigger() {
+      try {
+        const shouldTrigger = window.checkDailyTrigger();
+        const currentDate = new Date().toISOString().slice(0, 10);
+        updateView('Daily trigger check complete.', {
+          shouldTrigger: shouldTrigger,
+          currentDate: currentDate,
+          storedDate: window.readDateFromLocalStorage()
+        });
+      } catch (error) {
+        updateView('Error checking daily trigger: ' + error.message, '');
+      }
+    }
+
+    function handleAddTaskToTodo() {
+      try {
+        const taskName = document.getElementById('task-name-input').value;
+        const result = window.addTaskToTodo(taskName);
+        updateView('Added task to todo list.', result);
+      } catch (error) {
+        updateView('Error adding task to todo: ' + error.message, '');
+      }
+    }
+
+    function handleAddTemplate() {
+      try {
+        const taskName = document.getElementById('task-name-input').value;
+        const intervalInput = document.getElementById('interval_range');
+        const recurrenceInput = document.querySelector('input[name="recuring"]:checked');
+        const currentDate = new Date().toISOString().slice(0, 10);
+        const intervalValue = intervalInput ? intervalInput.value : '';
+        const taskType = recurrenceInput ? recurrenceInput.value : '';
+        const result = window.addTemplate(taskName, intervalValue, taskType, currentDate);
+        updateView('Added template.', result);
+      } catch (error) {
+        updateView('Error adding template: ' + error.message, '');
+      }
+    }
+
+    function handleDeleteTask() {
+      try {
+        const taskName = document.getElementById('task-name-input').value;
+        const result = window.deleteTask(taskName);
+        updateView('Delete task completed.', result);
+      } catch (error) {
+        updateView('Error deleting task: ' + error.message, '');
+      }
+    }
+
+    function handleDeleteTemplate() {
+      try {
+        const taskName = document.getElementById('task-name-input').value;
+        const result = window.deleteTemplate(taskName);
+        updateView('Delete template completed.', result);
+      } catch (error) {
+        updateView('Error deleting template: ' + error.message, '');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('save-data-button').addEventListener('click', handleSave);
+      document.getElementById('read-data-button').addEventListener('click', handleLoad);
+      document.getElementById('clear-data-button').addEventListener('click', handleClear);
+      document.getElementById('task-template-button').addEventListener('click', handleTaskTemplateOnly);
+      document.getElementById('save-date-button').addEventListener('click', handleSaveDate);
+      document.getElementById('read-date-button').addEventListener('click', handleReadDate);
+      document.getElementById('check-daily-trigger-button').addEventListener('click', handleCheckDailyTrigger);
+      document.getElementById('add-task-button').addEventListener('click', handleAddTaskToTodo);
+      document.getElementById('add-template-button').addEventListener('click', handleAddTemplate);
+      document.getElementById('delete-task-button').addEventListener('click', handleDeleteTask);
+      document.getElementById('delete-template-button').addEventListener('click', handleDeleteTemplate);
+    });
+  </script>
+  <script>
+    function handleDownloadLocalStorage() {
+      try {
+        const dataToDownload = window.getLocalStorageDataForDownload();
+        const content = 'window.data = ' + JSON.stringify(dataToDownload, null, 2) + ';\n';
+        const blob = new Blob([content], { type: 'application/javascript' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'data.js';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        if (typeof window.updateView === 'function') {
+          window.updateView('Downloaded local storage data as data.js.', dataToDownload);
+        }
+      } catch (error) {
+        if (typeof window.updateView === 'function') {
+          window.updateView('Error downloading data: ' + error.message, '');
+        }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const downloadButton = document.getElementById('download-data-button');
+      if (downloadButton) {
+        downloadButton.addEventListener('click', handleDownloadLocalStorage);
+      }
+    });
+  </script>
+</body>
+</html>
+ 

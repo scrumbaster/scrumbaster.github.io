@@ -1,7 +1,1830 @@
+<!DOCTYPE html>
 <html>
 <head>
+    <title>MyTasks</title>
+    <link rel="shortcut icon" type="image/png" href="static/favicon-32x32.png"/>
+    <link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="static/favicon-32x32.png"/>
+    <link rel="icon" type="image/png" sizes="16x16" href="static/favicon-16x16.png"/>
+    <link rel="manifest" crossorigin="use-credentials" href="static/site.webmanifest"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        .slidecontainer {
+            width: 100%;
+        }
+
+        .slider_red4 {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 5px;
+            border-radius: 2px;
+            background: #0A2463;
+            outline: black;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+
+            .slider_red4:hover {
+                opacity: 1;
+            }
+
+            .slider_red4::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 25px;
+                height: 25px;
+                border-radius: 50%;
+                background: #E71D36;
+                cursor: pointer;
+                margin-top: -23px;
+            }
+
+            .slider_red4::-moz-range-thumb {
+                width: 25px;
+                height: 25px;
+                border-radius: 50%;
+                background: #E71D36;
+                cursor: pointer;
+                margin-top: -23px;
+            }
+    </style>
+    <style>
+        .slidecontainer {
+            width: 100%;
+        }
+
+        .slider_red3 {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 5px;
+            border-radius: 2px;
+            background: #0A2463;
+            outline: black;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+
+            .slider_red3:hover {
+                opacity: 1;
+            }
+
+            .slider_red3::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: #E71D36;
+                cursor: pointer;
+                margin-top: -18px;
+            }
+
+            .slider_red3::-moz-range-thumb {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: #E71D36;
+                cursor: pointer;
+                margin-top: -18px;
+            }
+    </style>
+    <style>
+        .slidecontainer {
+            width: 100%;
+        }
+
+        .slider_red2 {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 5px;
+            border-radius: 2px;
+            background: #0A2463;
+            outline: black;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+
+            .slider_red2:hover {
+                opacity: 1;
+            }
+
+            .slider_red2::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background: #E71D36;
+                cursor: pointer;
+                margin-top: -10px;
+            }
+
+            .slider_red2::-moz-range-thumb {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background: #E71D36;
+                cursor: pointer;
+                margin-top: -10px;
+            }
+    </style>
+    <style>
+        .slidecontainer {
+            width: 100%;
+        }
+
+        .slider_green {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 5px;
+            border-radius: 2px;
+            background: #0A2463;
+            outline: black;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+
+            .slider_green:hover {
+                opacity: 1;
+            }
+
+            .slider_green::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 0px;
+                height: 0px;
+                border-radius: 50%;
+                background: #1B998B;
+                cursor: pointer;
+                margin-top: 0px;
+            }
+
+            .slider_green::-moz-range-thumb {
+                width: 0px;
+                height: 0px;
+                border-radius: 50%;
+                background: #1B998B;
+                cursor: pointer;
+                margin-top: 0px;
+            }
+    </style>
+    <style>
+        .slidecontainer {
+            width: 100%;
+        }
+
+        .slider_yellow {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 5px;
+            border-radius: 2px;
+            background: #0A2463;
+            outline: black;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+
+            .slider_yellow:hover {
+                opacity: 1;
+            }
+
+            .slider_yellow::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 0px;
+                height: 0px;
+                border-radius: 50%;
+                background: #FFA630;
+                cursor: pointer;
+                margin-top: -23px;
+            }
+
+            .slider_yellow::-moz-range-thumb {
+                width: 0px;
+                height: 0px;
+                border-radius: 50%;
+                background: #FFA630;
+                cursor: pointer;
+                margin-top: -23px;
+            }
+    </style>
+    <style>
+        .dot {
+            height: 25px;
+            width: 25px;
+            background-color: #0A2463;
+            border-radius: 50%;
+            display: none;
+            margin: 20px;
+        }
+    </style>
+    <style>
+        .dot_del {
+            height: 25px;
+            width: 25px;
+            background-color: #FFA630;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot_del1 {
+            font-size: xx-large;
+            font-weight: bold;
+            color: #FFA630;
+        }
+    </style>
+    <style>
+        .dot_undo {
+            height: 25px;
+            width: 25px;
+            background-color: #1B998B;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot_undo1 {
+            font-size: xx-large;
+            font-weight: bold;
+            color: #1B998B;
+        }
+    </style>
+    <style>
+        hr {
+            display: block;
+            width: 70%;
+            margin-left: 0;
+        }
+    </style>
+    <style>
+        .btn {
+            font-size: 36px;
+            border-radius: 10px;
+            margin: 10px;
+        }
+
+        .btn2 {
+            font-size: 36px;
+            border-radius: 10px;
+        }
+    </style>
+    <style>
+        .textarea {
+            width: 100%;
+            height: 180px;
+            padding: 12px 20px;
+            box-sizing: border-box;
+            border-radius: 10px;
+            /*background-color: white;*/
+            border: 1px solid black;
+            font-size: 36pt;
+            border: none;
+            overflow: scroll;
+            outline: none;
+        }
+    </style>
+    <style>
+        ul, #myUL {
+            list-style-type: none;
+
+        }
+
+        #myUL {
+            margin: 0;
+            padding: 0;
+        }
+
+        .caret {
+            color: darkcyan;
+            cursor: pointer;
+            -webkit-user-select: none; /* Safari 3.1+ */
+            -moz-user-select: none; /* Firefox 2+ */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none;
+            font-size: 26pt;
+            font-weight:bold;
+        }
+
+            .caret::before {
+                content: "\25B6";
+                color: darkcyan;
+                display: inline-block;
+                margin-right: 6px;
+            }
+
+        .caret-down::before {
+            -ms-transform: rotate(90deg); /* IE 9 */
+            -webkit-transform: rotate(90deg); /* Safari */
+            transform: rotate(90deg);
+        }
+
+        .nested {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .noncaret {
+            color: darkcyan;
+            cursor: pointer;
+            -webkit-user-select: none; /* Safari 3.1+ */
+            -moz-user-select: none; /* Firefox 2+ */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none;
+            font-size: 22pt;
+            font-style:italic;
+        }
+    </style>
+    <script src="data.js"></script>
+    <script src="data_access.js"></script>
 </head>
-<body>
-<h1>Hellow World</h1>
+<body onload="init_local_data_and_refresh()">
+
+    <div id="task_template_todo" style=" display : none">
+        <br><span id="slider0del" title="task_name" class="dot_del1" onclick=del_task2(this)>&#x1F5D1;</span>
+        <span id="slider0task" style="color:#FFA630;font-size:20pt;" onclick=edit_task2(this)>task_name</span><span id="slider0delconfirm" title="task_name" class="dot" onclick="alert('confirmed')"></span><br>
+        <input id="slider0" title="task_name" type="range" min="1" max="2" value="1" class="slider_yellow" style="width:70%" oninput=myoninput2(this) /><br>
+    </div>
+    <div id="task_template_doing" style=" display : none">
+
+        <br><b><span id="slider0task" style="color:#E71D36;font-size:20pt;">task_name</span></b><span id="slider0delconfirm" title="task_name" class="dot" onclick="alert('confirmed')"></span><br>
+        <input id="slider0" title="task_name" type="range" min="1" max="5" value="2" class="slider_red" style="width:70%" oninput=myoninput2(this) /><br>
+
+
+    </div>
+    <div id="task_template_done" style=" display : none">
+        <span id="slider0undo" title="task_name" class="dot_undo1" onclick=undo(this)>&#x2611;</span>
+        <b><del style="color:#1B998B"><span id="slider0task" style="color:#1B998B;font-size:18pt;">task_name</span></del></b><span id="slider0delconfirm" title="task_name" class="dot" onclick="alert('confirmed')"></span><br>
+        <hr>
+    </div>
+
+    <!--==============================================================================================================================================-->
+    <div id="tasks_list" style="max-width:600px;border:solid; border-radius: 10px; border-color:#546692; border-width:5px; display:none">
+        <div id="tasks_container">
+        </div>
+        <input value="+" style="font-size : 36px; border-radius: 10px;margin:10px;" type="button" onclick="edit_task_load()" />
+        <input value="+↻" style="font-size : 36px; border-radius: 10px;margin:10px;" type="button" onclick="load_add_from_task_list_container()" />
+        <script>
+
+
+
+            var tasks_container_div = document.getElementById("tasks_container");
+            var tasks_todo_div = document.getElementById("task_template_todo");
+            var tasks_doing_div = document.getElementById("task_template_doing");
+            var tasks_done_div = document.getElementById("task_template_done");
+            var tasks_list = document.getElementById("tasks_list");
+            var scroll_position = 0;
+            const task_readall = '{ "sp_name": "task_update", "params": ["", 0] }';
+
+
+
+            function del_task2(del_button) {
+                //console.log(document.documentElement.scrollTop);
+                scroll_position = document.documentElement.scrollTop;
+                confirm_btn = document.getElementById(del_button.id + "confirm");
+                del_button.style.display = "none";
+                confirm_btn.style.display = "inline-block";
+                const myTimeout = setTimeout(function () { confirm_btn.style.display = "none"; del_button.style.display = "inline-block"; confirm_btn.onclick = null; }, 2000);
+                confirm_btn.onclick = function () {
+                    clearTimeout(myTimeout);
+                    confirm_btn.onclick = null;
+                    confirm_btn.style.display = "none";
+                    del_button.style.display = "inline-block";
+                    tasks_list.style.display = "none";
+                    confirm_yes_el.disabled = false;
+                    if (del_button.title.includes('↻')) {
+                        delete_template_div.style.display = "block";
+                        delete_template.checked = false;
+                    }
+
+                    confirm_dlg.style.display = "block";
+                    confirm_yes_el.onclick = function () {
+                        confirm_yes_el.disabled = true;
+                        if (delete_template.checked) {
+                            request = '{"sp_name": "task_delete_template", "params": ["????"]}'.replace('????', del_button.title);
+                        } else {
+                            request = '{"sp_name": "task_delete", "params": ["????"]}'.replace('????', del_button.title);
+                        }
+                        delete_template_div.style.display = "none";
+                        delete_template.checked = false;
+                        exec_delete(request);
+                    }
+                }
+
+            }
+
+            function edit_task2(_task_el) {
+                scroll_position = document.documentElement.scrollTop;
+                confirm_btn = document.getElementById(_task_el.id.replace("task", "delconfirm"));
+                confirm_btn.style.display = "inline-block";
+                const myTimeout = setTimeout(function () { confirm_btn.style.display = "none"; confirm_btn.onclick = null; }, 2000);
+                confirm_btn.onclick = function (){
+                    clearTimeout(myTimeout);
+                    confirm_btn.onclick = null;
+                    confirm_btn.style.display = "none";
+                    task_name_el.innerText = _task_el.innerText;
+                    task_name_el.focus();
+                    tasks_list.style.display = "none";
+                    edit_task.style.display = 'block';
+                }
+            }
+
+            function undo(dotundo) {
+                scroll_position = document.documentElement.scrollTop;
+                confirm_btn = document.getElementById(dotundo.id.replace('undo', "delconfirm"));
+                dotundo.style.display = "none";
+                confirm_btn.style.display = "inline-block";
+                const myTimeout = setTimeout(function () { confirm_btn.style.display = "none"; dotundo.style.display = "inline-block"; exec_update(task_readall); confirm_btn.onclick = null; }, 2000);
+                confirm_btn.onclick = function () {
+                    clearTimeout(myTimeout);
+                    confirm_btn.onclick = null;
+                    confirm_btn.style.display = "none";
+                    dotundo.style.display = "inline-block";
+                    tasks_list.style.display = "none";
+                    confirm_yes_el.disabled = false;
+                    confirm_dlg.style.display = "block";
+                    confirm_yes_el.onclick = function () {
+                        confirm_yes_el.disabled = true;
+                        //request = '{ "task_completed": { "S": "4" }, "task_name": { "S": "????" } }'.replace('????', dotundo.title);
+                        request = '{"sp_name": "task_update", "params": ["????",4]}'.replace('????', dotundo.title);
+                        exec_update(request);
+                    }
+                }
+            }
+
+            function myoninput2(myslider) {
+                scroll_position = document.documentElement.scrollTop;
+                confirm_btn = document.getElementById(myslider.id + "delconfirm");
+                myslider.oninput = null;
+                confirm_btn.style.display = "inline-block";
+                const myTimeout = setTimeout(function () { confirm_btn.style.display = "none"; myslider.oninput = "myoninput(this);"; exec_update(task_readall); confirm_btn.onclick = null; }, 2000);
+                confirm_btn.onclick = function () {
+                    console.log('confirm_btn.onclick');
+                    clearTimeout(myTimeout);
+                    confirm_btn.onclick = null;
+                    confirm_btn.style.display = "none";
+                    myslider.oninput = "myoninput(this);"
+                    tasks_list.style.display = "none";
+                    confirm_yes_el.disabled = false;
+                    confirm_dlg.style.display = "block";
+                    confirm_yes_el.onclick = function () {
+                        confirm_yes_el.disabled = true;
+                        //request = '{ "task_completed": { "S": "!!!!" }, "task_name": { "S": "????" } }'.replace('!!!!', myslider.value).replace('????', myslider.title);
+                        request = '{"sp_name": "task_update", "params": ["????",!!!!]}'.replace('!!!!', myslider.value).replace('????', myslider.title);
+                        //console.log(request);
+                        exec_update(request)
+                    }
+                }
+            }
+
+
+            function load_tasks(tasks_items) {
+                tasks_container_div.innerHTML = "";
+                cnt = new Int32Array([0])
+                task_container_innerHTML = ""
+                //console.log(tasks_items)
+                tasks_items.forEach(item => add_task(item, cnt, task_container_innerHTML))
+                tasks_container_div.innerHTML = task_container_innerHTML;
+                tasks_list.style.display = "block";
+                confirm_dlg.style.display = "none";
+                add_from_task_list_dlg_el.style.display = "none";
+                document.documentElement.scrollTop = scroll_position;
+            }
+
+            function add_task(task_item, cnt) {
+                cnt[0]++
+                task_completed_value = task_item["task_completed"];
+                task_name = task_item["task_name"];
+
+                if (task_completed_value > 4) {
+                    task_container_innerHTML = task_container_innerHTML.concat(
+                        tasks_done_div.innerHTML.replaceAll('slider0', 'slider' + cnt[0])
+                            .replaceAll('task_name', task_name)
+
+                    )
+                } else
+                    if (task_completed_value < 2) {
+                        task_container_innerHTML = task_container_innerHTML.concat(
+                            tasks_todo_div.innerHTML.replaceAll('slider0', 'slider' + cnt[0])
+                                .replaceAll('task_name', task_name)
+                        )
+                    } else {
+
+                        task_container_innerHTML = task_container_innerHTML.concat(
+                            tasks_doing_div.innerHTML.replaceAll('slider0', 'slider' + cnt[0])
+                                .replaceAll('task_name', task_name)
+                                .replace('value="2"', 'value="2"'.replace("2", task_completed_value))
+                                .replace('slider_red', 'slider_red'.concat(task_completed_value))
+
+                        )
+
+                    }
+
+            }
+
+            function init_local_data_and_refresh() {
+                if (window.ensureStorageInitialized) {
+                    window.ensureStorageInitialized();
+                }
+                exec_update(task_readall);
+            }
+
+            function exec_delete(_input) {
+                try {
+                    const payload = JSON.parse(_input);
+                    const taskName = payload.params && payload.params[0];
+                    if (payload.sp_name === "task_delete_template" && window.deleteTemplate) {
+                        window.deleteTemplate(taskName);
+                    } else if (payload.sp_name === "task_delete" && window.deleteTask) {
+                        window.deleteTask(taskName);
+                    }
+                    load_tasks(window.getTaskItemsForUi ? window.getTaskItemsForUi() : []);
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+            function exec_update(_input) {
+                try {
+                    const payload = JSON.parse(_input);
+                    if (payload.sp_name === "task_update" && payload.params && payload.params[0] && window.updateTaskCompletion) {
+                        const taskName = payload.params[0];
+                        const completionValue = payload.params[1];
+                        window.updateTaskCompletion(taskName, completionValue);
+                    }
+                    load_tasks(window.getTaskItemsForUi ? window.getTaskItemsForUi() : []);
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+        </script>
+    </div>
+    <!--==============================================================================================================================================-->
+    <div id="add_from_task_list_dlg" style="max-width:600px;border:solid; border-radius: 10px; border-color:#546692; border-width:5px;display:none;">
+        <div id="task_template_for_list" style=" display : none">
+            <b><span id="template0" style="color:#7776BC;font-size:18pt;" onclick="add_requring_task_confirm(this)">task_name</span></b><span id="template0confirm" title="task_name" class="dot" onclick="alert('add_requring_task(this.title)')"></span><br>
+            <span id="template0info" style="font-size:8pt;display:block;">template_info</span>
+            <hr style="margin-top:0px;">
+        </div>
+        <div id="add_from_task_list_container">
+        </div>
+        <script>
+            var add_from_task_list_dlg_el = document.getElementById("add_from_task_list_dlg");
+            var add_from_task_list_container_el = document.getElementById("add_from_task_list_container");
+            var task_template_for_list_el = document.getElementById("task_template_for_list");
+            function load_add_from_task_list_container() {
+                const templates = window.getTaskTemplatesInfo ? window.getTaskTemplatesInfo() : [];
+                populate_add_from_task_list_container_el(templates);
+            }
+
+            function populate_add_from_task_list_container_el(_tasks_items) {
+                add_from_task_list_container_el.innerHTML = "";
+                cnt = new Int32Array([0])
+                add_from_task_list_container_el_innerHTML = "";
+                _tasks_items.forEach(item => add_task_to_list_container(item,cnt))
+                //console.log(add_from_task_list_container_el_innerHTML);
+                add_from_task_list_container_el.innerHTML = add_from_task_list_container_el_innerHTML;
+                tasks_list.style.display = 'none';
+                add_from_task_list_dlg_el.style.display = "block";
+            }
+
+            function add_task_to_list_container(_item, _cnt) {
+                _cnt[0]++;
+                add_from_task_list_container_el_innerHTML = add_from_task_list_container_el_innerHTML
+                    + task_template_for_list_el.innerHTML.replaceAll("task_name", _item["task_name"]).replaceAll("template0", "template" + _cnt[0]).replaceAll("template_info", _item["info"]);
+                //console.log(_add_from_task_list_container_el_innerHTML);
+            };
+
+            function add_requring_task_confirm(_task_span) {
+                console.log(_task_span.id + "confirm")
+                confirm_btn = document.getElementById(_task_span.id+"confirm");
+                confirm_btn.style.display = "inline-block";
+                const myTimeout = setTimeout(function () { confirm_btn.style.display = "none";}, 2000);
+                confirm_btn.onclick = function () {
+                    clearTimeout(myTimeout);
+                    confirm_btn.onclick = null;
+                    confirm_btn.style.display = "none";
+                    go_to_pressed = true;
+                    if (window.addTaskToTodo) {
+                        window.addTaskToTodo(_task_span.innerText);
+                    }
+                    show_result_message("success")
+                }
+
+            }
+
+            function add_requring_task(_requring_task_to_add) {
+                go_to_pressed = true;
+                if (window.addTaskToTodo) {
+                    window.addTaskToTodo(_requring_task_to_add);
+                }
+                show_result_message("success")
+            }
+
+
+        </script>
+    </div>
+        <!--==============================================================================================================================================-->
+        <div id="edit_task" style="max-width:600px;border:solid; border-radius: 10px; border-color:#546692; border-width:5px;display:none;">
+            <input value="💾" type="button" style="width:25%;" class="btn" onclick="save_task(false)" />
+            <input value="🔥" type="button" style="width:25%;" class="btn" onclick="clear_text()" />
+            <input value="📋" type="button" style="width:25%;" class="btn" onclick="goto_todo()" />
+            <span id="result_message"></span>
+            <div id="task_name" class='textarea' contenteditable>
+
+            </div>
+            <input value="👔" type="button" style="width:23%;" class="btn2" onclick="insert_symbol(this.value)" />
+            <input value="💰" type="button" style="width:23%;" class="btn2" onclick="insert_symbol(this.value)" />
+            <input value="🏠" type="button" style="width:23%;" class="btn2" onclick="insert_symbol(this.value)" />
+            <input value="🩺" type="button" style="width:23%;" class="btn2" onclick="insert_symbol(this.value)" />
+            <input value="🤼" type="button" style="width:23%;" class="btn2" onclick="insert_symbol(this.value)" />
+            <input value="🦁" type="button" style="width:23%;" class="btn2" onclick="insert_symbol(this.value)" />
+            <input value="🚙" type="button" style="width:23%;" class="btn2" onclick="insert_symbol(this.value)" />
+            <input value="🎧" type="button" style="width:23%;" class="btn2" onclick="insert_symbol(this.value)" />
+            <input value="🏖️" type="button" style="width:23%;" class="btn2" onclick="insert_symbol(this.value)" />
+            <input value="🛠️" type="button" style="width:23%;" class="btn2" onclick="insert_symbol(this.value)" />
+            <input value="↻" type="button" style="width:23%;font-size:28pt;" class="btn2" onclick="insert_symbol(this.value)" />
+            <input value="🌳" type="button" style="width:23%;" class="btn2" onclick="if (tree_div.style.display == 'none') { tree_div.style.display = 'block'; } else { tree_div.style.display = 'none';  }" />
+            <script>
+                var clearing_timeout
+                var result_message = document.getElementById("result_message");
+                var task_name_el = document.getElementById("task_name");
+                var edit_task = document.getElementById("edit_task");
+                var go_to_pressed = false;
+
+                function insert_symbol(symbol) {
+
+                    task_name_txt = task_name_el.innerText;
+                    task_name_txt = task_name_txt.replaceAll('👔', '');
+                    task_name_txt = task_name_txt.replaceAll('💰', '');
+                    task_name_txt = task_name_txt.replaceAll('🏠', '');
+                    task_name_txt = task_name_txt.replaceAll('🩺', '');
+                    task_name_txt = task_name_txt.replaceAll('🤼', '');
+                    task_name_txt = task_name_txt.replaceAll('🦁', '');
+                    task_name_txt = task_name_txt.replaceAll('🚙', '');
+                    task_name_txt = task_name_txt.replaceAll('🦷', '');
+                    task_name_txt = task_name_txt.replaceAll('🏖️', '');
+                    task_name_txt = task_name_txt.replaceAll('🚴', '');
+                    task_name_txt = task_name_txt.replaceAll('🛠️', '');
+                    if (symbol == '↻') { task_name_txt = task_name_txt.replaceAll('↻', ''); }
+
+                    task_name_txt = symbol + task_name_txt;
+                    task_name_el.innerHTML = task_name_txt;
+                    task_name_el.focus();
+
+                }
+
+                function edit_task_load() {
+                    scroll_position = document.documentElement.scrollTop;
+                    tasks_list.style.display = 'none';
+                    edit_task.style.display = 'block';
+                    clear_text();
+                }
+                function clear_text() {
+                    task_name_el.innerText = "";
+                    task_name_el.readOnly = true;
+                    task_name_el.readOnly = false;
+                    task_name_el.focus();
+                }
+                function show_result_message(result_msg) {
+
+                    if (result_msg == "success") {
+                        clearing_timeout = setTimeout(clear_result_message, 2000);
+                        result_message.style.color = "#1B998B";
+                        result_message.innerHTML = result_msg;
+                        if (go_to_pressed) {
+                            go_to_pressed = false;
+                            exec_update(task_readall);
+                        }
+
+                    } else {
+                        result_message.style.color = "#E71D36";
+                        result_message.innerHTML = result_msg;
+                        clearing_timeout = setTimeout(clear_result_message, 9000);
+
+                    }
+
+                }
+                function clear_result_message() {
+                    result_message.innerHTML = "";
+                    task_name_el.innerText = "";
+                    task_name_el.readOnly = false;
+                    task_name_el.focus();
+                }
+                function goto_todo() {
+                    if (task_name_el.innerText.includes('↻')) {
+                        tree_div.style.display = 'none';
+                        edit_task.style.display = 'none';
+                        task_name_recurrence_dlg.innerText = task_name_el.innerText;
+                        recurrence_dlg.style.display = 'block'
+                        recuring_click("DaysFromPrev");
+                        //console.log('after recuring_click');
+                    } else {
+                        tree_div.style.display = 'none';
+                        edit_task.style.display = 'none';
+                        tasks_list.style.display = 'block';
+
+                        if (task_name_el.innerText != "") {
+                            go_to_pressed = true;
+                            save_task(true);
+                        } else {
+                            exec_update(task_readall);
+                        }
+                    }
+                }
+
+                function save_task(shouldGoToTodo) {
+                    if (task_name_el.innerText.includes('↻')) {
+                        tree_div.style.display = 'none';
+                        edit_task.style.display = 'none';
+                        recurrence_dlg.style.display = 'block'
+                        task_name_recurrence_dlg.innerText = task_name_el.innerText;
+                        recuring_click("DaysFromPrev");
+                        console.log('after recuring_click');
+                    } else {
+                        task_name_el.readOnly = true;
+                        task_name = task_name_el.innerText;
+                        request = '{"sp_name": "task_add", "params": ["????"]}'.replace('????', task_name);
+                        exec_edit_task(request, shouldGoToTodo)
+                    }
+
+                }
+                function exec_edit_task(input, shouldGoToTodo) {
+                    try {
+                        const taskName = task_name_el.innerText.trim();
+                        if (!taskName) {
+                            show_result_message("Task name is required.");
+                            return;
+                        }
+                        if (window.addTaskToTodo) {
+                            window.addTaskToTodo(taskName);
+                            if (shouldGoToTodo) {
+                                go_to_pressed = true;
+                            }
+                            show_result_message("success");
+                            return;
+                        }
+                        show_result_message("Local data layer unavailable.");
+                    } catch (error) {
+                        show_result_message(error.message || "Error");
+                    }
+                }
+
+            </script>
+
+        </div>
+        <!--==============================================================================================================================================-->
+        <div id="tree" style="max-width:600px;border:solid; border-radius: 10px; border-color:#546692; border-width:5px; display:none">
+
+            <ul id="risks" style="padding:0px;">
+                <li>
+                    <input type="radio" name="tree" onclick="caret_click(this)" /><span class="caret" onclick="caret_click(this)">🩺Health</span>
+                    <ul class="nested">
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Weight</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Vacations</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Remove moles from balls</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Annual check up</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">B12</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Health problems</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Eating</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Exercising</span></li>
+                        <li>
+                            <input type="radio" name="tree" onclick="caret_click(this)" /><span class="caret" onclick="caret_click(this)">🦷Dental</span>
+                            <ul class="nested">
+                                <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Dental cleaning</span></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <input type="radio" name="tree" onclick="caret_click(this)" /><span class="caret" onclick="caret_click(this)">💰Finance</span>
+                                                                                  <ul class="nested">
+                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Property taxes</span></li>
+                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Tax return</span></li>
+                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Financial literacy</span></li>
+                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Market monitoring</span></li>
+                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Open or close accounts</span></li>
+                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Credit score</span></li>
+                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Insurance</span></li>
+                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Investments</span></li>
+                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Trading Stratagies</span></li>
+                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Sell gold and silver</span></li>
+                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">FSA reimburcement</span></li>
+                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Long termn care insurance</span></li>
+                                                                                  </ul>
+                </li>
+                <li>
+                    <input type="radio" name="tree" onclick="caret_click(this)" /><span class="caret" onclick="caret_click(this)">🚙Cars Care</span>
+                    <ul class="nested">
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Check liquids</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Clean the windshild and mirrors</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Bateries</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Wipers</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Filters</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Oil change</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Breaks</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Tires</span></li>
+                    </ul>
+                </li>
+                <li>
+                    <input type="radio" name="tree" onclick="caret_click(this)" /><span class="caret" onclick="caret_click(this)">🏠Home Care</span>
+                    <ul class="nested">
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Lown mover maintanance</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Snow blower maintanance</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Heating maintenance</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Gutters</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Home improvments</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Termite protection</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Ants Protection</span></li>
+                    </ul>
+                </li>
+                <li>
+                    <input type="radio" name="tree" onclick="caret_click(this)" /><span class="caret" onclick="caret_click(this)">👔Work</span>
+                    <ul class="nested">
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Updating LinkedIn Profile and Resume</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Build-up skill set for the next job</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Building relationships with people</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Cloud learning</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Python learning</span></li>
+                    </ul>
+                </li>
+                <li>
+                    <input type="radio" name="tree" onclick="caret_click(this)" /><span class="caret" onclick="caret_click(this)">🦁Leo</span>
+                    <ul class="nested">
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Leo's credit cards and other payments</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Leo's medical needs</span></li>
+                    </ul>
+                </li>
+                <li>
+                    <input type="radio" name="tree" onclick="caret_click(this)" /><span class="caret" onclick="caret_click(this)">🤼Relationships</span>
+                        <ul class="nested">
+                            <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Igor Gerasin</span></li>
+                            <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Vlad</span></li>
+                            <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Masha</span></li>
+                            <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Sasha</span></li>
+                            <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Mario</span></li>
+                            <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Igor Raspin</span></li>
+                            <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Vartan</span></li>
+                            <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Kostya</span></li>
+                        </ul>
+                </li>
+                <li>
+                    <input type="radio" name="tree" onclick="caret_click(this)" /><span class="caret" onclick="caret_click(this)">🏖️Retirement</span>
+                    <ul class="nested">
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Learn cooking</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Reparing stuff to save money</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Audiobooks</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Learn fixing shoes</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Catching small game</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Biking</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Gardening</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Fishing</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Organize Photos</span></li>
+                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Compensate executive function</span></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <script>
+                var tree_div = document.getElementById("tree");
+                function caret_click(caret) {
+                    if (caret.parentElement.querySelector(".nested") != null) {
+                        var parent = caret.parentElement;
+                        var all_parents = [];
+                        while (parent != null && parent.id != 'risks') {
+                            all_parents.push(parent);
+                            parent = parent.parentElement;
+                        }
+                        console.log(all_parents);
+                        var carets = document.getElementById("risks").querySelectorAll(".caret-down");
+                        for (var i = 0; i < carets.length; i++) {
+                            if (all_parents.indexOf(carets.item(i).parentElement) < 0) {
+                                carets.item(i).parentElement.querySelector(".nested").classList.remove("active");
+                                carets.item(i).parentElement.querySelector(".caret").classList.remove("caret-down");
+                            }
+                        }
+
+                        if (caret.parentElement.querySelector(".nested") != null) {
+                            caret.parentElement.querySelector(".nested").classList.toggle("active");
+                            caret.parentElement.querySelector(".caret").classList.toggle("caret-down");
+                        }
+
+                    }
+                }
+            </script>
+
+        </div>
+        <!--==============================================================================================================================================-->
+        <div id="confirm_dlg" style="max-width:600px;border:solid; border-radius: 10px; border-color:#546692; border-width:5px;display:none;margin-top:200px">
+            <div>
+                <input value="✔️" id="confirm_yes" type="button" style="width:20%; color:green;font-weight:bold;" class="btn" onclick="alert('YES')" />
+                <input value="Confirm!" type="button" style="width:43%;margin:0px;font-size:20pt;" class="btn" disabled />
+                <input value="❌" type="button" style="width:20%;" class="btn" onclick="confirm_no()" />
+            </div>
+            <div id="delete_template_div" style="text-align:center;color:#546692;display:none">
+                <h2>
+                    <input id="delete_template" name="delete_template" type="checkbox" style="display:inline-block;height: 25px;width: 25px;border-radius: 10px;border: 2px solid #34495E;" value="yes" />
+                    <label for="delete_template">Delete along with template.</label>
+                </h2>
+            </div>
+            <script>
+                var delete_template_div = document.getElementById("delete_template_div");
+                var delete_template = document.getElementById("delete_template");
+                var confirm_dlg_el = document.getElementById("confirm_dlg");
+                var confirm_yes_el = document.getElementById("confirm_yes");
+                function confirm_no() {
+                    delete_template_div.style.display = 'none';
+                    delete_template.checked = false;
+                    confirm_dlg_el.style.display = 'none';
+                    confirm_yes_el.onclick = null;
+                    exec_update(task_readall);
+                }
+            </script>
+        </div>
+        <!--==============================================================================================================================================-->
+        <div id="recurrence_dlg" style="max-width:600px;border:solid; border-radius: 10px; border-color:#546692; border-width:5px;display:none;margin-top:0px">
+
+            <h2>
+                <span id="task_name_recurrence_dlg"></span><hr>
+                <input type="radio" name="recuring" value="Yearly" onclick="recuring_click(this.value)" />Yearly<br><br>
+                <input type="radio" name="recuring" value="Monthly" onclick="recuring_click(this.value)" />Monthly<br><br>
+                <input type="radio" name="recuring" value="Weekly" onclick="recuring_click(this.value)" />Weekly<br><br>
+                <input id="DaysFromPrev" type="radio" name="recuring" value="DaysFromPrev" onclick="recuring_click(this.value)" checked />Days Interval<br>
+
+            </h2>
+            <input type="button" class="btn" onclick="step_left()" style="width:20%;" value="<" />
+            <input id="interval" value="" type="button" style="width:43%;margin:0px;font-size:20pt;" class="btn" disabled />
+            <input type="button" class="btn" onclick="step_right()" style="width:20%;" value=">" /><br><br>
+            <br>
+            <input id="interval_range" type="range" min="0" max="7" value="0" style="width:95%;margin:10px;" oninput=slider_move(); /><br><br>
+            <input value="✔️" id="confirm_recurrence_yes" type="button" style="width:20%; color:green;font-weight:bold;" class="btn" onclick="task_add_template()" />
+            <input value="Confirm!" type="button" style="width:43%;margin:0px;font-size:20pt;" class="btn" disabled />
+            <input value="❌" type="button" style="width:20%;" class="btn" onclick="confirm_recurrence_no()" />
+
+
+            <script>
+                recurrence_dlg = document.getElementById('recurrence_dlg');
+                interval = document.getElementById('interval');
+                interval_range = document.getElementById('interval_range');
+                confirm_recurrence_yes = document.getElementById('confirm_recurrence_yes');
+                task_name_recurrence_dlg = document.getElementById('task_name_recurrence_dlg');
+                var dict
+                var Weekly = [
+                    [1, "Sunday"],
+                    [2, "Monday"],
+                    [3, "Tusday"],
+                    [4, "Wednesday"],
+                    [5, "Thursday"],
+                    [6, "Friday"],
+                    [7, "Sartuday"]
+                ];
+                var Monthly = [
+                    [1, "1"],
+                    [2, "2"],
+                    [3, "3"],
+                    [4, "4"],
+                    [5, "5"],
+                    [6, "6"],
+                    [7, "7"],
+                    [8, "8"],
+                    [9, "9"],
+                    [10, "10"],
+                    [11, "11"],
+                    [12, "12"],
+                    [13, "13"],
+                    [14, "14"],
+                    [15, "15"],
+                    [16, "16"],
+                    [17, "17"],
+                    [18, "18"],
+                    [19, "19"],
+                    [20, "20"],
+                    [21, "21"],
+                    [22, "22"],
+                    [23, "23"],
+                    [24, "24"],
+                    [25, "25"],
+                    [26, "26"],
+                    [27, "27"],
+                    [28, "28"]
+                ];
+                var Yearly = [
+                    [101, "Jan 1"],
+                    [102, "Jan 2"],
+                    [103, "Jan 3"],
+                    [104, "Jan 4"],
+                    [105, "Jan 5"],
+                    [106, "Jan 6"],
+                    [107, "Jan 7"],
+                    [108, "Jan 8"],
+                    [109, "Jan 9"],
+                    [110, "Jan 10"],
+                    [111, "Jan 11"],
+                    [112, "Jan 12"],
+                    [113, "Jan 13"],
+                    [114, "Jan 14"],
+                    [115, "Jan 15"],
+                    [116, "Jan 16"],
+                    [117, "Jan 17"],
+                    [118, "Jan 18"],
+                    [119, "Jan 19"],
+                    [120, "Jan 20"],
+                    [121, "Jan 21"],
+                    [122, "Jan 22"],
+                    [123, "Jan 23"],
+                    [124, "Jan 24"],
+                    [125, "Jan 25"],
+                    [126, "Jan 26"],
+                    [127, "Jan 27"],
+                    [128, "Jan 28"],
+                    [129, "Jan 29"],
+                    [130, "Jan 30"],
+                    [131, "Jan 31"],
+                    [201, "Feb 1"],
+                    [202, "Feb 2"],
+                    [203, "Feb 3"],
+                    [204, "Feb 4"],
+                    [205, "Feb 5"],
+                    [206, "Feb 6"],
+                    [207, "Feb 7"],
+                    [208, "Feb 8"],
+                    [209, "Feb 9"],
+                    [210, "Feb 10"],
+                    [211, "Feb 11"],
+                    [212, "Feb 12"],
+                    [213, "Feb 13"],
+                    [214, "Feb 14"],
+                    [215, "Feb 15"],
+                    [216, "Feb 16"],
+                    [217, "Feb 17"],
+                    [218, "Feb 18"],
+                    [219, "Feb 19"],
+                    [220, "Feb 20"],
+                    [221, "Feb 21"],
+                    [222, "Feb 22"],
+                    [223, "Feb 23"],
+                    [224, "Feb 24"],
+                    [225, "Feb 25"],
+                    [226, "Feb 26"],
+                    [227, "Feb 27"],
+                    [228, "Feb 28"],
+                    [301, "Mar 1"],
+                    [302, "Mar 2"],
+                    [303, "Mar 3"],
+                    [304, "Mar 4"],
+                    [305, "Mar 5"],
+                    [306, "Mar 6"],
+                    [307, "Mar 7"],
+                    [308, "Mar 8"],
+                    [309, "Mar 9"],
+                    [310, "Mar 10"],
+                    [311, "Mar 11"],
+                    [312, "Mar 12"],
+                    [313, "Mar 13"],
+                    [314, "Mar 14"],
+                    [315, "Mar 15"],
+                    [316, "Mar 16"],
+                    [317, "Mar 17"],
+                    [318, "Mar 18"],
+                    [319, "Mar 19"],
+                    [320, "Mar 20"],
+                    [321, "Mar 21"],
+                    [322, "Mar 22"],
+                    [323, "Mar 23"],
+                    [324, "Mar 24"],
+                    [325, "Mar 25"],
+                    [326, "Mar 26"],
+                    [327, "Mar 27"],
+                    [328, "Mar 28"],
+                    [329, "Mar 29"],
+                    [330, "Mar 30"],
+                    [331, "Mar 31"],
+                    [401, "Apr 1"],
+                    [402, "Apr 2"],
+                    [403, "Apr 3"],
+                    [404, "Apr 4"],
+                    [405, "Apr 5"],
+                    [406, "Apr 6"],
+                    [407, "Apr 7"],
+                    [408, "Apr 8"],
+                    [409, "Apr 9"],
+                    [410, "Apr 10"],
+                    [411, "Apr 11"],
+                    [412, "Apr 12"],
+                    [413, "Apr 13"],
+                    [414, "Apr 14"],
+                    [415, "Apr 15"],
+                    [416, "Apr 16"],
+                    [417, "Apr 17"],
+                    [418, "Apr 18"],
+                    [419, "Apr 19"],
+                    [420, "Apr 20"],
+                    [421, "Apr 21"],
+                    [422, "Apr 22"],
+                    [423, "Apr 23"],
+                    [424, "Apr 24"],
+                    [425, "Apr 25"],
+                    [426, "Apr 26"],
+                    [427, "Apr 27"],
+                    [428, "Apr 28"],
+                    [429, "Apr 29"],
+                    [430, "Apr 30"],
+                    [501, "May 1"],
+                    [502, "May 2"],
+                    [503, "May 3"],
+                    [504, "May 4"],
+                    [505, "May 5"],
+                    [506, "May 6"],
+                    [507, "May 7"],
+                    [508, "May 8"],
+                    [509, "May 9"],
+                    [510, "May 10"],
+                    [511, "May 11"],
+                    [512, "May 12"],
+                    [513, "May 13"],
+                    [514, "May 14"],
+                    [515, "May 15"],
+                    [516, "May 16"],
+                    [517, "May 17"],
+                    [518, "May 18"],
+                    [519, "May 19"],
+                    [520, "May 20"],
+                    [521, "May 21"],
+                    [522, "May 22"],
+                    [523, "May 23"],
+                    [524, "May 24"],
+                    [525, "May 25"],
+                    [526, "May 26"],
+                    [527, "May 27"],
+                    [528, "May 28"],
+                    [529, "May 29"],
+                    [530, "May 30"],
+                    [531, "May 31"],
+                    [601, "Jun 1"],
+                    [602, "Jun 2"],
+                    [603, "Jun 3"],
+                    [604, "Jun 4"],
+                    [605, "Jun 5"],
+                    [606, "Jun 6"],
+                    [607, "Jun 7"],
+                    [608, "Jun 8"],
+                    [609, "Jun 9"],
+                    [610, "Jun 10"],
+                    [611, "Jun 11"],
+                    [612, "Jun 12"],
+                    [613, "Jun 13"],
+                    [614, "Jun 14"],
+                    [615, "Jun 15"],
+                    [616, "Jun 16"],
+                    [617, "Jun 17"],
+                    [618, "Jun 18"],
+                    [619, "Jun 19"],
+                    [620, "Jun 20"],
+                    [621, "Jun 21"],
+                    [622, "Jun 22"],
+                    [623, "Jun 23"],
+                    [624, "Jun 24"],
+                    [625, "Jun 25"],
+                    [626, "Jun 26"],
+                    [627, "Jun 27"],
+                    [628, "Jun 28"],
+                    [629, "Jun 29"],
+                    [630, "Jun 30"],
+                    [701, "Jul 1"],
+                    [702, "Jul 2"],
+                    [703, "Jul 3"],
+                    [704, "Jul 4"],
+                    [705, "Jul 5"],
+                    [706, "Jul 6"],
+                    [707, "Jul 7"],
+                    [708, "Jul 8"],
+                    [709, "Jul 9"],
+                    [710, "Jul 10"],
+                    [711, "Jul 11"],
+                    [712, "Jul 12"],
+                    [713, "Jul 13"],
+                    [714, "Jul 14"],
+                    [715, "Jul 15"],
+                    [716, "Jul 16"],
+                    [717, "Jul 17"],
+                    [718, "Jul 18"],
+                    [719, "Jul 19"],
+                    [720, "Jul 20"],
+                    [721, "Jul 21"],
+                    [722, "Jul 22"],
+                    [723, "Jul 23"],
+                    [724, "Jul 24"],
+                    [725, "Jul 25"],
+                    [726, "Jul 26"],
+                    [727, "Jul 27"],
+                    [728, "Jul 28"],
+                    [729, "Jul 29"],
+                    [730, "Jul 30"],
+                    [731, "Jul 31"],
+                    [801, "Aug 1"],
+                    [802, "Aug 2"],
+                    [803, "Aug 3"],
+                    [804, "Aug 4"],
+                    [805, "Aug 5"],
+                    [806, "Aug 6"],
+                    [807, "Aug 7"],
+                    [808, "Aug 8"],
+                    [809, "Aug 9"],
+                    [810, "Aug 10"],
+                    [811, "Aug 11"],
+                    [812, "Aug 12"],
+                    [813, "Aug 13"],
+                    [814, "Aug 14"],
+                    [815, "Aug 15"],
+                    [816, "Aug 16"],
+                    [817, "Aug 17"],
+                    [818, "Aug 18"],
+                    [819, "Aug 19"],
+                    [820, "Aug 20"],
+                    [821, "Aug 21"],
+                    [822, "Aug 22"],
+                    [823, "Aug 23"],
+                    [824, "Aug 24"],
+                    [825, "Aug 25"],
+                    [826, "Aug 26"],
+                    [827, "Aug 27"],
+                    [828, "Aug 28"],
+                    [829, "Aug 29"],
+                    [830, "Aug 30"],
+                    [831, "Aug 31"],
+                    [901, "Sep 1"],
+                    [902, "Sep 2"],
+                    [903, "Sep 3"],
+                    [904, "Sep 4"],
+                    [905, "Sep 5"],
+                    [906, "Sep 6"],
+                    [907, "Sep 7"],
+                    [908, "Sep 8"],
+                    [909, "Sep 9"],
+                    [910, "Sep 10"],
+                    [911, "Sep 11"],
+                    [912, "Sep 12"],
+                    [913, "Sep 13"],
+                    [914, "Sep 14"],
+                    [915, "Sep 15"],
+                    [916, "Sep 16"],
+                    [917, "Sep 17"],
+                    [918, "Sep 18"],
+                    [919, "Sep 19"],
+                    [920, "Sep 20"],
+                    [921, "Sep 21"],
+                    [922, "Sep 22"],
+                    [923, "Sep 23"],
+                    [924, "Sep 24"],
+                    [925, "Sep 25"],
+                    [926, "Sep 26"],
+                    [927, "Sep 27"],
+                    [928, "Sep 28"],
+                    [929, "Sep 29"],
+                    [930, "Sep 30"],
+                    [1001, "Oct 1"],
+                    [1002, "Oct 2"],
+                    [1003, "Oct 3"],
+                    [1004, "Oct 4"],
+                    [1005, "Oct 5"],
+                    [1006, "Oct 6"],
+                    [1007, "Oct 7"],
+                    [1008, "Oct 8"],
+                    [1009, "Oct 9"],
+                    [1010, "Oct 10"],
+                    [1011, "Oct 11"],
+                    [1012, "Oct 12"],
+                    [1013, "Oct 13"],
+                    [1014, "Oct 14"],
+                    [1015, "Oct 15"],
+                    [1016, "Oct 16"],
+                    [1017, "Oct 17"],
+                    [1018, "Oct 18"],
+                    [1019, "Oct 19"],
+                    [1020, "Oct 20"],
+                    [1021, "Oct 21"],
+                    [1022, "Oct 22"],
+                    [1023, "Oct 23"],
+                    [1024, "Oct 24"],
+                    [1025, "Oct 25"],
+                    [1026, "Oct 26"],
+                    [1027, "Oct 27"],
+                    [1028, "Oct 28"],
+                    [1029, "Oct 29"],
+                    [1030, "Oct 30"],
+                    [1031, "Oct 31"],
+                    [1101, "Nov 1"],
+                    [1102, "Nov 2"],
+                    [1103, "Nov 3"],
+                    [1104, "Nov 4"],
+                    [1105, "Nov 5"],
+                    [1106, "Nov 6"],
+                    [1107, "Nov 7"],
+                    [1108, "Nov 8"],
+                    [1109, "Nov 9"],
+                    [1110, "Nov 10"],
+                    [1111, "Nov 11"],
+                    [1112, "Nov 12"],
+                    [1113, "Nov 13"],
+                    [1114, "Nov 14"],
+                    [1115, "Nov 15"],
+                    [1116, "Nov 16"],
+                    [1117, "Nov 17"],
+                    [1118, "Nov 18"],
+                    [1119, "Nov 19"],
+                    [1120, "Nov 20"],
+                    [1121, "Nov 21"],
+                    [1122, "Nov 22"],
+                    [1123, "Nov 23"],
+                    [1124, "Nov 24"],
+                    [1125, "Nov 25"],
+                    [1126, "Nov 26"],
+                    [1127, "Nov 27"],
+                    [1128, "Nov 28"],
+                    [1129, "Nov 29"],
+                    [1130, "Nov 30"],
+                    [1201, "Dec 1"],
+                    [1202, "Dec 2"],
+                    [1203, "Dec 3"],
+                    [1204, "Dec 4"],
+                    [1205, "Dec 5"],
+                    [1206, "Dec 6"],
+                    [1207, "Dec 7"],
+                    [1208, "Dec 8"],
+                    [1209, "Dec 9"],
+                    [1210, "Dec 10"],
+                    [1211, "Dec 11"],
+                    [1212, "Dec 12"],
+                    [1213, "Dec 13"],
+                    [1214, "Dec 14"],
+                    [1215, "Dec 15"],
+                    [1216, "Dec 16"],
+                    [1217, "Dec 17"],
+                    [1218, "Dec 18"],
+                    [1219, "Dec 19"],
+                    [1220, "Dec 20"],
+                    [1221, "Dec 21"],
+                    [1222, "Dec 22"],
+                    [1223, "Dec 23"],
+                    [1224, "Dec 24"],
+                    [1225, "Dec 25"],
+                    [1226, "Dec 26"],
+                    [1227, "Dec 27"],
+                    [1228, "Dec 28"],
+                    [1229, "Dec 29"],
+                    [1230, "Dec 30"],
+                    [1231, "Dec 31"]
+
+                ];
+                var DaysFromPrev = [
+                    [0, "0"],
+                    [1, "1"],
+                    [2, "2"],
+                    [3, "3"],
+                    [4, "4"],
+                    [5, "5"],
+                    [6, "6"],
+                    [7, "7"],
+                    [8, "8"],
+                    [9, "9"],
+                    [10, "10"],
+                    [11, "11"],
+                    [12, "12"],
+                    [13, "13"],
+                    [14, "14"],
+                    [15, "15"],
+                    [16, "16"],
+                    [17, "17"],
+                    [18, "18"],
+                    [19, "19"],
+                    [20, "20"],
+                    [21, "21"],
+                    [22, "22"],
+                    [23, "23"],
+                    [24, "24"],
+                    [25, "25"],
+                    [26, "26"],
+                    [27, "27"],
+                    [28, "28"],
+                    [29, "29"],
+                    [30, "30"],
+                    [31, "31"],
+                    [32, "32"],
+                    [33, "33"],
+                    [34, "34"],
+                    [35, "35"],
+                    [36, "36"],
+                    [37, "37"],
+                    [38, "38"],
+                    [39, "39"],
+                    [40, "40"],
+                    [41, "41"],
+                    [42, "42"],
+                    [43, "43"],
+                    [44, "44"],
+                    [45, "45"],
+                    [46, "46"],
+                    [47, "47"],
+                    [48, "48"],
+                    [49, "49"],
+                    [50, "50"],
+                    [51, "51"],
+                    [52, "52"],
+                    [53, "53"],
+                    [54, "54"],
+                    [55, "55"],
+                    [56, "56"],
+                    [57, "57"],
+                    [58, "58"],
+                    [59, "59"],
+                    [60, "60"],
+                    [61, "61"],
+                    [62, "62"],
+                    [63, "63"],
+                    [64, "64"],
+                    [65, "65"],
+                    [66, "66"],
+                    [67, "67"],
+                    [68, "68"],
+                    [69, "69"],
+                    [70, "70"],
+                    [71, "71"],
+                    [72, "72"],
+                    [73, "73"],
+                    [74, "74"],
+                    [75, "75"],
+                    [76, "76"],
+                    [77, "77"],
+                    [78, "78"],
+                    [79, "79"],
+                    [80, "80"],
+                    [81, "81"],
+                    [82, "82"],
+                    [83, "83"],
+                    [84, "84"],
+                    [85, "85"],
+                    [86, "86"],
+                    [87, "87"],
+                    [88, "88"],
+                    [89, "89"],
+                    [90, "90"],
+                    [91, "91"],
+                    [92, "92"],
+                    [93, "93"],
+                    [94, "94"],
+                    [95, "95"],
+                    [96, "96"],
+                    [97, "97"],
+                    [98, "98"],
+                    [99, "99"],
+                    [100, "100"],
+                    [101, "101"],
+                    [102, "102"],
+                    [103, "103"],
+                    [104, "104"],
+                    [105, "105"],
+                    [106, "106"],
+                    [107, "107"],
+                    [108, "108"],
+                    [109, "109"],
+                    [110, "110"],
+                    [111, "111"],
+                    [112, "112"],
+                    [113, "113"],
+                    [114, "114"],
+                    [115, "115"],
+                    [116, "116"],
+                    [117, "117"],
+                    [118, "118"],
+                    [119, "119"],
+                    [120, "120"],
+                    [121, "121"],
+                    [122, "122"],
+                    [123, "123"],
+                    [124, "124"],
+                    [125, "125"],
+                    [126, "126"],
+                    [127, "127"],
+                    [128, "128"],
+                    [129, "129"],
+                    [130, "130"],
+                    [131, "131"],
+                    [132, "132"],
+                    [133, "133"],
+                    [134, "134"],
+                    [135, "135"],
+                    [136, "136"],
+                    [137, "137"],
+                    [138, "138"],
+                    [139, "139"],
+                    [140, "140"],
+                    [141, "141"],
+                    [142, "142"],
+                    [143, "143"],
+                    [144, "144"],
+                    [145, "145"],
+                    [146, "146"],
+                    [147, "147"],
+                    [148, "148"],
+                    [149, "149"],
+                    [150, "150"],
+                    [151, "151"],
+                    [152, "152"],
+                    [153, "153"],
+                    [154, "154"],
+                    [155, "155"],
+                    [156, "156"],
+                    [157, "157"],
+                    [158, "158"],
+                    [159, "159"],
+                    [160, "160"],
+                    [161, "161"],
+                    [162, "162"],
+                    [163, "163"],
+                    [164, "164"],
+                    [165, "165"],
+                    [166, "166"],
+                    [167, "167"],
+                    [168, "168"],
+                    [169, "169"],
+                    [170, "170"],
+                    [171, "171"],
+                    [172, "172"],
+                    [173, "173"],
+                    [174, "174"],
+                    [175, "175"],
+                    [176, "176"],
+                    [177, "177"],
+                    [178, "178"],
+                    [179, "179"],
+                    [180, "180"],
+                    [181, "181"],
+                    [182, "182"],
+                    [183, "183"],
+                    [184, "184"],
+                    [185, "185"],
+                    [186, "186"],
+                    [187, "187"],
+                    [188, "188"],
+                    [189, "189"],
+                    [190, "190"],
+                    [191, "191"],
+                    [192, "192"],
+                    [193, "193"],
+                    [194, "194"],
+                    [195, "195"],
+                    [196, "196"],
+                    [197, "197"],
+                    [198, "198"],
+                    [199, "199"],
+                    [200, "200"],
+                    [201, "201"],
+                    [202, "202"],
+                    [203, "203"],
+                    [204, "204"],
+                    [205, "205"],
+                    [206, "206"],
+                    [207, "207"],
+                    [208, "208"],
+                    [209, "209"],
+                    [210, "210"],
+                    [211, "211"],
+                    [212, "212"],
+                    [213, "213"],
+                    [214, "214"],
+                    [215, "215"],
+                    [216, "216"],
+                    [217, "217"],
+                    [218, "218"],
+                    [219, "219"],
+                    [220, "220"],
+                    [221, "221"],
+                    [222, "222"],
+                    [223, "223"],
+                    [224, "224"],
+                    [225, "225"],
+                    [226, "226"],
+                    [227, "227"],
+                    [228, "228"],
+                    [229, "229"],
+                    [230, "230"],
+                    [231, "231"],
+                    [232, "232"],
+                    [233, "233"],
+                    [234, "234"],
+                    [235, "235"],
+                    [236, "236"],
+                    [237, "237"],
+                    [238, "238"],
+                    [239, "239"],
+                    [240, "240"],
+                    [241, "241"],
+                    [242, "242"],
+                    [243, "243"],
+                    [244, "244"],
+                    [245, "245"],
+                    [246, "246"],
+                    [247, "247"],
+                    [248, "248"],
+                    [249, "249"],
+                    [250, "250"],
+                    [251, "251"],
+                    [252, "252"],
+                    [253, "253"],
+                    [254, "254"],
+                    [255, "255"],
+                    [256, "256"],
+                    [257, "257"],
+                    [258, "258"],
+                    [259, "259"],
+                    [260, "260"],
+                    [261, "261"],
+                    [262, "262"],
+                    [263, "263"],
+                    [264, "264"],
+                    [265, "265"],
+                    [266, "266"],
+                    [267, "267"],
+                    [268, "268"],
+                    [269, "269"],
+                    [270, "270"],
+                    [271, "271"],
+                    [272, "272"],
+                    [273, "273"],
+                    [274, "274"],
+                    [275, "275"],
+                    [276, "276"],
+                    [277, "277"],
+                    [278, "278"],
+                    [279, "279"],
+                    [280, "280"],
+                    [281, "281"],
+                    [282, "282"],
+                    [283, "283"],
+                    [284, "284"],
+                    [285, "285"],
+                    [286, "286"],
+                    [287, "287"],
+                    [288, "288"],
+                    [289, "289"],
+                    [290, "290"],
+                    [291, "291"],
+                    [292, "292"],
+                    [293, "293"],
+                    [294, "294"],
+                    [295, "295"],
+                    [296, "296"],
+                    [297, "297"],
+                    [298, "298"],
+                    [299, "299"],
+                    [300, "300"],
+                    [301, "301"],
+                    [302, "302"],
+                    [303, "303"],
+                    [304, "304"],
+                    [305, "305"],
+                    [306, "306"],
+                    [307, "307"],
+                    [308, "308"],
+                    [309, "309"],
+                    [310, "310"],
+                    [311, "311"],
+                    [312, "312"],
+                    [313, "313"],
+                    [314, "314"],
+                    [315, "315"],
+                    [316, "316"],
+                    [317, "317"],
+                    [318, "318"],
+                    [319, "319"],
+                    [320, "320"],
+                    [321, "321"],
+                    [322, "322"],
+                    [323, "323"],
+                    [324, "324"],
+                    [325, "325"],
+                    [326, "326"],
+                    [327, "327"],
+                    [328, "328"],
+                    [329, "329"],
+                    [330, "330"],
+                    [331, "331"],
+                    [332, "332"],
+                    [333, "333"],
+                    [334, "334"],
+                    [335, "335"],
+                    [336, "336"],
+                    [337, "337"],
+                    [338, "338"],
+                    [339, "339"],
+                    [340, "340"],
+                    [341, "341"],
+                    [342, "342"],
+                    [343, "343"],
+                    [344, "344"],
+                    [345, "345"],
+                    [346, "346"],
+                    [347, "347"],
+                    [348, "348"],
+                    [349, "349"],
+                    [350, "350"],
+                    [351, "351"],
+                    [352, "352"],
+                    [353, "353"],
+                    [354, "354"],
+                    [355, "355"],
+                    [356, "356"],
+                    [357, "357"],
+                    [358, "358"],
+                    [359, "359"],
+                    [360, "360"],
+                    [361, "361"],
+                    [362, "362"],
+                    [363, "363"],
+                    [364, "364"],
+                    [365, "365"]
+                ];
+
+                dict = DaysFromPrev;
+
+                var values = [];
+                var min_position = 0;
+                var max_position = 0;
+                var position = 0;
+                recuring_click("DaysFromPrev");
+                task_type = "DaysFromPrev";
+
+                function task_add_template() {
+                    task_name = task_name_recurrence_dlg.innerText;
+                    try {
+                        if (window.addTemplate) {
+                            window.addTemplate(task_name, values[0], task_type, new Date().toISOString().slice(0, 10));
+                            confirm_recurrence_no();
+                        } else {
+                            alert('Local data layer unavailable.');
+                        }
+                    } catch (e) {
+                        alert(e);
+                    }
+                }
+
+                function confirm_recurrence_no() {
+                    recurrence_dlg.style.display = 'none';
+                    recuring_click("DaysFromPrev");
+                    exec_update(task_readall);
+                }
+
+                function recuring_click(radio_value) {
+                    console.log('recuring_click');
+                    if (radio_value == "Yearly") { dict = Yearly; task_type = "Yearly"; }
+                    else if (radio_value == "Monthly") { dict = Monthly; task_type = "Monthly"; }
+                    else if (radio_value == "Weekly") { dict = Weekly; task_type = "Weekly"; }
+                    else {
+
+                        dict = DaysFromPrev;
+                        document.getElementById('DaysFromPrev').checked = true;
+                        task_type = "DaysFromPrev";
+                    };
+                    max_position = dict.length - 1;
+                    interval_range.max = max_position;
+                    interval_range.value = Math.floor(max_position / 2);
+                    position = interval_range.value;
+                    move();
+                }
+
+                function slider_move() {
+                    position = interval_range.value;
+                    move();
+                }
+
+                function step_left() {
+                    position--;
+                    interval_range.value = position;
+                    move();
+                }
+                function step_right() {
+                    position++;
+                    interval_range.value = position;
+                    move();
+
+                }
+
+                function move() {
+                    if (position < min_position) (position = min_position);
+                    if (position > max_position) (position = max_position);
+                    values = dict[position];
+                    interval.value = values[1];
+                }
+
+            </script>
+            </span>
+
 </body>
 </html>
