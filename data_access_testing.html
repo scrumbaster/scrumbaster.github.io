@@ -1017,6 +1017,55 @@
       }
     }
 
+    function replaceTasksLocally(todoRows, templateRows) {
+      if (!Array.isArray(todoRows) || !Array.isArray(templateRows)) {
+        throw new Error('Migration data must contain todo and template lists.');
+      }
+
+      const taskTodo = {};
+      todoRows.forEach(function (row) {
+        const completion = Number(row.task_completed);
+        if (!row.task_name || !Number.isFinite(completion)) {
+          throw new Error('Invalid migrated todo row.');
+        }
+        taskTodo[row.task_name] = {
+          lud: row.last_updated_date || null,
+          tc: completion
+        };
+      });
+
+      const taskTemplate = {};
+      templateRows.forEach(function (row) {
+        const interval = Number(row.interval);
+        if (!row.task_name || !Number.isFinite(interval)) {
+          throw new Error('Invalid migrated template row.');
+        }
+        taskTemplate[row.task_name] = {
+          int: interval,
+          lcd: row.last_completed_date || null,
+          tt: row.task_type || ''
+        };
+      });
+
+      let stored = {};
+      const existingData = localStorage.getItem('db');
+      if (existingData) {
+        stored = JSON.parse(existingData);
+      } else if (window.data && typeof window.data === 'object') {
+        stored = Object.assign({}, window.data);
+      }
+
+      stored.task_todo = taskTodo;
+      stored.task_template = taskTemplate;
+      localStorage.setItem('db', JSON.stringify(stored));
+
+      return {
+        success: true,
+        todoCount: Object.keys(taskTodo).length,
+        templateCount: Object.keys(taskTemplate).length
+      };
+    }
+
     async function handleRetrieveApiTodo() {
       const button = document.getElementById('retrieve-api-todo-button');
       button.disabled = true;
@@ -1047,11 +1096,7 @@
           retrieveDataset('templates')
         ]);
 
-        if (!window.replaceTasksFromMigration) {
-          throw new Error('Local migration function is unavailable.');
-        }
-
-        const migrationResult = window.replaceTasksFromMigration(results[0], results[1]);
+        const migrationResult = replaceTasksLocally(results[0], results[1]);
 
         updateView('Migrated todo tasks and templates into local storage.', {
           migration: migrationResult,
