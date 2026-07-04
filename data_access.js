@@ -329,7 +329,7 @@
       }
 
       taskTodo[row.task_name] = {
-        lud: row.last_updated_date || null,
+        lud: row.last_updated_date || row.lud || null,
         tc: parsedCompletion
       };
     });
@@ -340,10 +340,17 @@
         throw new Error("A migrated template row is missing task_name.");
       }
 
+      const intervalValue = row.interval !== undefined ? row.interval : row.int;
+      const parsedInterval = Number(intervalValue);
+
+      if (!Number.isFinite(parsedInterval)) {
+        throw new Error("Invalid interval value for " + row.task_name + ".");
+      }
+
       taskTemplate[row.task_name] = {
-        int: Number(row.interval) || 0,
-        lcd: row.last_completed_date || null,
-        tt: row.task_type || ""
+        int: parsedInterval,
+        lcd: row.last_completed_date || row.lcd || null,
+        tt: row.task_type || row.tt || ""
       };
     });
 

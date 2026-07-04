@@ -1024,26 +1024,28 @@
 
       const taskTodo = {};
       todoRows.forEach(function (row) {
-        const completion = Number(row.task_completed);
+        const completionValue = row.task_completed !== undefined ? row.task_completed : row.tc;
+        const completion = Number(completionValue);
         if (!row.task_name || !Number.isFinite(completion)) {
           throw new Error('Invalid migrated todo row.');
         }
         taskTodo[row.task_name] = {
-          lud: row.last_updated_date || null,
+          lud: row.last_updated_date || row.lud || null,
           tc: completion
         };
       });
 
       const taskTemplate = {};
       templateRows.forEach(function (row) {
-        const interval = Number(row.interval);
+        const intervalValue = row.interval !== undefined ? row.interval : row.int;
+        const interval = Number(intervalValue);
         if (!row.task_name || !Number.isFinite(interval)) {
           throw new Error('Invalid migrated template row.');
         }
         taskTemplate[row.task_name] = {
           int: interval,
-          lcd: row.last_completed_date || null,
-          tt: row.task_type || ''
+          lcd: row.last_completed_date || row.lcd || null,
+          tt: row.task_type || row.tt || ''
         };
       });
 
