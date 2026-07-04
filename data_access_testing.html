@@ -26,6 +26,7 @@
   <button id="add-template-button" type="button">Add Template</button>
   <button id="delete-task-button" type="button">Delete Task</button>
   <button id="delete-template-button" type="button">Delete Template</button>
+  <button id="retrieve-api-todo-button" type="button">Retrieve API Data (Migration)</button>
   <button id="download-data-button" type="button">Download local storage as data.js</button>
 
   <p id="status">No action taken yet.</p>
@@ -1016,6 +1017,54 @@
       }
     }
 
+    async function handleRetrieveApiTodo() {
+      const button = document.getElementById('retrieve-api-todo-button');
+      button.disabled = true;
+      updateView('Retrieving todo tasks and templates from YSTasks...', '');
+
+      try {
+        async function retrieveDataset(dataset) {
+          const response = await fetch(
+            'https://ystasks.pythonanywhere.com/db/?dataset=' + encodeURIComponent(dataset)
+          );
+          const responseText = await response.text();
+
+          if (!response.ok) {
+            throw new Error(
+              dataset + ' API returned HTTP ' + response.status + ': ' + responseText
+            );
+          }
+
+          try {
+            return JSON.parse(responseText);
+          } catch (error) {
+            throw new Error(dataset + ' API returned invalid JSON: ' + responseText);
+          }
+        }
+
+        const results = await Promise.all([
+          retrieveDataset('todo'),
+          retrieveDataset('templates')
+        ]);
+
+        if (!window.replaceTasksFromMigration) {
+          throw new Error('Local migration function is unavailable.');
+        }
+
+        const migrationResult = window.replaceTasksFromMigration(results[0], results[1]);
+
+        updateView('Migrated todo tasks and templates into local storage.', {
+          migration: migrationResult,
+          todo: results[0],
+          templates: results[1]
+        });
+      } catch (error) {
+        updateView('Error retrieving migration data from YSTasks: ' + error.message, '');
+      } finally {
+        button.disabled = false;
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('save-data-button').addEventListener('click', handleSave);
       document.getElementById('read-data-button').addEventListener('click', handleLoad);
@@ -1028,6 +1077,7 @@
       document.getElementById('add-template-button').addEventListener('click', handleAddTemplate);
       document.getElementById('delete-task-button').addEventListener('click', handleDeleteTask);
       document.getElementById('delete-template-button').addEventListener('click', handleDeleteTemplate);
+      document.getElementById('retrieve-api-todo-button').addEventListener('click', handleRetrieveApiTodo);
     });
   </script>
   <script>
@@ -1063,4 +1113,3 @@
   </script>
 </body>
 </html>
- 

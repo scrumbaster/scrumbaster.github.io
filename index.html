@@ -503,7 +503,8 @@
 
             function add_task(task_item, cnt) {
                 cnt[0]++
-                task_completed_value = task_item["task_completed"];
+                task_completed_value = Number(task_item["task_completed"]);
+                if (!Number.isFinite(task_completed_value)) { task_completed_value = 0; }
                 task_name = task_item["task_name"];
 
                 if (task_completed_value > 4) {

@@ -276,20 +276,15 @@
     }
 
     return Object.keys(stored.task_todo).map(function (taskName) {
+      const completionValue = stored.task_todo[taskName].tc;
       return {
         task_name: taskName,
-        task_completed: Number(stored.task_todo[taskName].tc) || 0
+        task_completed: Number.isFinite(Number(completionValue)) ? Number(completionValue) : 0
       };
     }).sort(function (a, b) {
-      const aState = a.task_completed > 4 ? 0 : a.task_completed < 2 ? 2 : 1;
-      const bState = b.task_completed > 4 ? 0 : b.task_completed < 2 ? 2 : 1;
-
-      if (aState !== bState) {
-        return aState - bState;
-      }
-
-      if (aState === 1) {
-        return b.task_completed - a.task_completed;
+      const completionOrder = b.task_completed - a.task_completed;
+      if (completionOrder !== 0) {
+        return completionOrder;
       }
 
       return a.task_name.localeCompare(b.task_name);
@@ -311,6 +306,57 @@
         }).join(" / ")
       };
     });
+  }
+
+  function replaceTasksFromMigration(todoRows, templateRows) {
+    if (!Array.isArray(todoRows) || !Array.isArray(templateRows)) {
+      throw new Error("Migration data must contain todo and template lists.");
+    }
+
+    const taskTodo = {};
+    todoRows.forEach(function (row) {
+      if (!row || typeof row.task_name !== "string" || !row.task_name.trim()) {
+        throw new Error("A migrated todo row is missing task_name.");
+      }
+
+      const completionValue = row.task_completed !== undefined
+        ? row.task_completed
+        : row.tc;
+      const parsedCompletion = Number(completionValue);
+
+      if (!Number.isFinite(parsedCompletion)) {
+        throw new Error("Invalid task_completed value for " + row.task_name + ".");
+      }
+
+      taskTodo[row.task_name] = {
+        lud: row.last_updated_date || null,
+        tc: parsedCompletion
+      };
+    });
+
+    const taskTemplate = {};
+    templateRows.forEach(function (row) {
+      if (!row || typeof row.task_name !== "string" || !row.task_name.trim()) {
+        throw new Error("A migrated template row is missing task_name.");
+      }
+
+      taskTemplate[row.task_name] = {
+        int: Number(row.interval) || 0,
+        lcd: row.last_completed_date || null,
+        tt: row.task_type || ""
+      };
+    });
+
+    const stored = ensureStorageInitialized() || {};
+    stored.task_todo = taskTodo;
+    stored.task_template = taskTemplate;
+    global.localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+
+    return {
+      success: true,
+      todoCount: Object.keys(taskTodo).length,
+      templateCount: Object.keys(taskTemplate).length
+    };
   }
 
   function updateTaskCompletion(taskName, completionValue) {
@@ -476,6 +522,7 @@
     ensureStorageInitialized,
     getTaskItemsForUi,
     getTaskTemplatesInfo,
+    replaceTasksFromMigration,
     updateTaskCompletion,
     addTaskToTodo,
     addTemplate,
@@ -497,6 +544,7 @@
   global.ensureStorageInitialized = ensureStorageInitialized;
   global.getTaskItemsForUi = getTaskItemsForUi;
   global.getTaskTemplatesInfo = getTaskTemplatesInfo;
+  global.replaceTasksFromMigration = replaceTasksFromMigration;
   global.updateTaskCompletion = updateTaskCompletion;
   global.addTaskToTodo = addTaskToTodo;
   global.addTemplate = addTemplate;
