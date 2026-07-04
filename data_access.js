@@ -91,6 +91,153 @@
     return stored.settings.CURDATE.val;
   }
 
+  function formatDateToString(dateValue) {
+    return new Date(dateValue).toISOString().slice(0, 10);
+  }
+
+  function getDaysDifference(startDate, endDate) {
+    if (!startDate || !endDate) {
+      return null;
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+      return null;
+    }
+
+    return Math.round((end - start) / (1000 * 60 * 60 * 24));
+  }
+
+  function taskReschedule() {
+    const stored = ensureStorageInitialized();
+    if (!stored || typeof stored !== "object") {
+      throw new Error("No data available to reschedule.");
+    }
+
+    if (!stored.settings) {
+      stored.settings = {};
+    }
+
+    if (!stored.task_todo) {
+      stored.task_todo = {};
+    }
+
+    if (!stored.task_template) {
+      stored.task_template = {};
+    }
+
+    const now = new Date();
+    const todayString = formatDateToString(now);
+    const storedDate = stored.settings.CURDATE && stored.settings.CURDATE.val ? stored.settings.CURDATE.val : null;
+    const currentHour = now.getHours();
+
+    if (storedDate === todayString) {
+      return { success: true, skipped: true, reason: "already_rescheduled", date: todayString };
+    }
+
+    if (currentHour < 6) {
+      return { success: true, skipped: true, reason: "before_6am", date: todayString };
+    }
+
+    const yesterdayDate = new Date(now);
+    yesterdayDate.setUTCDate(yesterdayDate.getUTCDate() - 1);
+    const yesterdayString = formatDateToString(yesterdayDate);
+
+    stored.settings.CURDATE = { val: todayString };
+
+    const updatedTaskNames = [];
+    Object.keys(stored.task_todo).forEach(function (taskName) {
+      const task = stored.task_todo[taskName];
+      if (task && task.lud === todayString) {
+        task.lud = yesterdayString;
+        updatedTaskNames.push(taskName);
+      }
+    });
+
+    Object.keys(stored.task_template).forEach(function (taskName) {
+      const template = stored.task_template[taskName];
+      const todoItem = stored.task_todo[taskName];
+      if (template && todoItem && todoItem.lud) {
+        template.lcd = todoItem.lud;
+      }
+    });
+
+    const deletedTaskNames = [];
+    Object.keys(stored.task_todo).forEach(function (taskName) {
+      const task = stored.task_todo[taskName];
+      if (task && Number(task.tc) === 5) {
+        delete stored.task_todo[taskName];
+        deletedTaskNames.push(taskName);
+      }
+    });
+
+    const insertedTaskNames = [];
+    const existingTaskNames = Object.keys(stored.task_todo);
+
+    Object.keys(stored.task_template).forEach(function (taskName) {
+      const template = stored.task_template[taskName];
+      if (!template || existingTaskNames.indexOf(taskName) !== -1) {
+        return;
+      }
+
+      if (template.tt === "DaysFromPrev") {
+        const difference = getDaysDifference(template.lcd, todayString);
+        if (difference !== null && difference > Number(template.int)) {
+          stored.task_todo[taskName] = { lud: todayString, tc: 0 };
+          existingTaskNames.push(taskName);
+          insertedTaskNames.push(taskName);
+        }
+        return;
+      }
+
+      if (template.tt === "Yearly") {
+        const monthDay = Number(todayString.slice(5, 7)) * 100 + Number(todayString.slice(8, 10));
+        if (monthDay === Number(template.int)) {
+          stored.task_todo[taskName] = { lud: todayString, tc: 0 };
+          existingTaskNames.push(taskName);
+          insertedTaskNames.push(taskName);
+        }
+        return;
+      }
+
+      if (template.tt === "Monthly") {
+        const dayOfMonth = Number(todayString.slice(8, 10));
+        if (dayOfMonth === Number(template.int)) {
+          stored.task_todo[taskName] = { lud: todayString, tc: 0 };
+          existingTaskNames.push(taskName);
+          insertedTaskNames.push(taskName);
+        }
+        return;
+      }
+
+      if (template.tt === "Weekly") {
+        const dayOfWeek = now.getDay() + 1;
+        if (dayOfWeek === Number(template.int)) {
+          stored.task_todo[taskName] = { lud: todayString, tc: 0 };
+          existingTaskNames.push(taskName);
+          insertedTaskNames.push(taskName);
+        }
+      }
+    });
+
+    global.localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+
+    return {
+      success: true,
+      skipped: false,
+      date: todayString,
+      updatedTaskNames,
+      deletedTaskNames,
+      insertedTaskNames
+    };
+  }
+
+  function task_reschecule() {
+    return taskReschedule();
+  }
+
   function checkDailyTrigger() {
     const today = new Date();
     const todayString = today.toISOString().slice(0, 10);
@@ -98,12 +245,12 @@
 
     if (!storedDate) {
       saveDateToLocalStorage(todayString);
-      return true;
+      return taskReschedule();
     }
 
     if (storedDate !== todayString) {
       saveDateToLocalStorage(todayString);
-      return true;
+      return taskReschedule();
     }
 
     return false;
@@ -335,6 +482,8 @@
     getTaskTemplateOnly,
     saveDateToLocalStorage,
     readDateFromLocalStorage,
+    taskReschedule,
+    task_reschecule,
     checkDailyTrigger,
     ensureStorageInitialized,
     getTaskItemsForUi,
@@ -353,6 +502,9 @@
   global.getTaskTemplateOnly = getTaskTemplateOnly;
   global.saveDateToLocalStorage = saveDateToLocalStorage;
   global.readDateFromLocalStorage = readDateFromLocalStorage;
+  global.taskReschedule = taskReschedule;
+  global.task_reschedule = taskReschedule;
+  global.task_reschecule = task_reschecule;
   global.checkDailyTrigger = checkDailyTrigger;
   global.ensureStorageInitialized = ensureStorageInitialized;
   global.getTaskItemsForUi = getTaskItemsForUi;
