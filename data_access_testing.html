@@ -1017,17 +1017,30 @@
       }
     }
 
-    function replaceTasksLocally(todoRows, templateRows) {
+    function replaceTasksLocally(todoRows, templateRows, diagnostics) {
+      diagnostics.stage = 'validate_api_rows';
       if (!Array.isArray(todoRows) || !Array.isArray(templateRows)) {
-        throw new Error('Migration data must contain todo and template lists.');
+        throw new Error(
+          'Expected arrays. todo=' + Object.prototype.toString.call(todoRows)
+          + ', templates=' + Object.prototype.toString.call(templateRows)
+        );
       }
 
+      diagnostics.rowCounts = { todo: todoRows.length, templates: templateRows.length };
+
       const taskTodo = {};
-      todoRows.forEach(function (row) {
+      todoRows.forEach(function (row, index) {
+        if (!row || typeof row !== 'object') {
+          throw new Error('Todo row ' + index + ' is not an object: ' + JSON.stringify(row));
+        }
         const completionValue = row.task_completed !== undefined ? row.task_completed : row.tc;
         const completion = Number(completionValue);
         if (!row.task_name || !Number.isFinite(completion)) {
-          throw new Error('Invalid migrated todo row.');
+          throw new Error(
+            'Invalid todo row ' + index + '. keys=[' + Object.keys(row).join(', ')
+            + '], task_name=' + JSON.stringify(row.task_name)
+            + ', completion=' + JSON.stringify(completionValue)
+          );
         }
         taskTodo[row.task_name] = {
           lud: row.last_updated_date || row.lud || null,
@@ -1036,11 +1049,18 @@
       });
 
       const taskTemplate = {};
-      templateRows.forEach(function (row) {
+      templateRows.forEach(function (row, index) {
+        if (!row || typeof row !== 'object') {
+          throw new Error('Template row ' + index + ' is not an object: ' + JSON.stringify(row));
+        }
         const intervalValue = row.interval !== undefined ? row.interval : row.int;
         const interval = Number(intervalValue);
         if (!row.task_name || !Number.isFinite(interval)) {
-          throw new Error('Invalid migrated template row.');
+          throw new Error(
+            'Invalid template row ' + index + '. keys=[' + Object.keys(row).join(', ')
+            + '], task_name=' + JSON.stringify(row.task_name)
+            + ', interval=' + JSON.stringify(intervalValue)
+          );
         }
         taskTemplate[row.task_name] = {
           int: interval,
@@ -1049,17 +1069,47 @@
         };
       });
 
+      diagnostics.stage = 'read_local_storage';
       let stored = {};
       const existingData = localStorage.getItem('db');
+      diagnostics.storage = {
+        existing: Boolean(existingData),
+        existingCharacters: existingData ? existingData.length : 0
+      };
       if (existingData) {
-        stored = JSON.parse(existingData);
+        try {
+          stored = JSON.parse(existingData);
+        } catch (error) {
+          throw new Error('Existing localStorage "db" contains invalid JSON: ' + error.message);
+        }
       } else if (window.data && typeof window.data === 'object') {
         stored = Object.assign({}, window.data);
       }
 
       stored.task_todo = taskTodo;
       stored.task_template = taskTemplate;
-      localStorage.setItem('db', JSON.stringify(stored));
+      diagnostics.stage = 'write_local_storage';
+      const serializedData = JSON.stringify(stored);
+      diagnostics.storage.newCharacters = serializedData.length;
+      localStorage.setItem('db', serializedData);
+
+      diagnostics.stage = 'verify_local_storage';
+      const savedData = localStorage.getItem('db');
+      if (!savedData) {
+        throw new Error('localStorage write completed but key "db" could not be read back.');
+      }
+      const verifiedData = JSON.parse(savedData);
+      const verifiedTodoCount = Object.keys(verifiedData.task_todo || {}).length;
+      const verifiedTemplateCount = Object.keys(verifiedData.task_template || {}).length;
+      diagnostics.storage.verifiedTodoCount = verifiedTodoCount;
+      diagnostics.storage.verifiedTemplateCount = verifiedTemplateCount;
+
+      if (verifiedTodoCount !== todoRows.length || verifiedTemplateCount !== templateRows.length) {
+        throw new Error(
+          'Storage verification count mismatch. Expected ' + todoRows.length + '/'
+          + templateRows.length + ', found ' + verifiedTodoCount + '/' + verifiedTemplateCount + '.'
+        );
+      }
 
       return {
         success: true,
@@ -1070,26 +1120,80 @@
 
     async function handleRetrieveApiTodo() {
       const button = document.getElementById('retrieve-api-todo-button');
+      const diagnostics = {
+        startedAt: new Date().toISOString(),
+        stage: 'starting',
+        pageUrl: window.location.href,
+        origin: window.location.origin,
+        online: navigator.onLine,
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        cookieEnabled: navigator.cookieEnabled,
+        localStorageAvailable: typeof localStorage !== 'undefined',
+        api: {}
+      };
       button.disabled = true;
-      updateView('Retrieving todo tasks and templates from YSTasks...', '');
+      updateView('Migration diagnostic started...', diagnostics);
 
       try {
         async function retrieveDataset(dataset) {
-          const response = await fetch(
-            'https://ystasks.pythonanywhere.com/db/?dataset=' + encodeURIComponent(dataset)
-          );
+          const url = 'https://ystasks.pythonanywhere.com/db/?dataset='
+            + encodeURIComponent(dataset);
+          const requestInfo = diagnostics.api[dataset] = {
+            url: url,
+            startedAt: new Date().toISOString()
+          };
+          const started = Date.now();
+          diagnostics.stage = 'fetch_' + dataset;
+          let response;
+
+          try {
+            response = await fetch(url, {
+              method: 'GET',
+              mode: 'cors',
+              cache: 'no-store',
+              credentials: 'omit'
+            });
+          } catch (error) {
+            requestInfo.durationMs = Date.now() - started;
+            requestInfo.fetchError = {
+              name: error.name,
+              message: error.message,
+              stack: error.stack || null
+            };
+            throw new Error(dataset + ' network/CORS failure: ' + error.message);
+          }
+
+          requestInfo.durationMs = Date.now() - started;
+          requestInfo.status = response.status;
+          requestInfo.statusText = response.statusText;
+          requestInfo.ok = response.ok;
+          requestInfo.type = response.type;
+          requestInfo.redirected = response.redirected;
+          requestInfo.finalUrl = response.url;
+          requestInfo.contentType = response.headers.get('content-type');
+          requestInfo.allowOrigin = response.headers.get('access-control-allow-origin');
+
+          diagnostics.stage = 'read_' + dataset + '_response';
           const responseText = await response.text();
+          requestInfo.responseCharacters = responseText.length;
+          requestInfo.bodyPreview = responseText.slice(0, 1000);
 
           if (!response.ok) {
             throw new Error(
-              dataset + ' API returned HTTP ' + response.status + ': ' + responseText
+              dataset + ' API returned HTTP ' + response.status + ' ' + response.statusText
             );
           }
 
+          diagnostics.stage = 'parse_' + dataset + '_json';
           try {
-            return JSON.parse(responseText);
+            const parsed = JSON.parse(responseText);
+            requestInfo.parsedType = Object.prototype.toString.call(parsed);
+            requestInfo.parsedRows = Array.isArray(parsed) ? parsed.length : null;
+            return parsed;
           } catch (error) {
-            throw new Error(dataset + ' API returned invalid JSON: ' + responseText);
+            requestInfo.parseError = error.message;
+            throw new Error(dataset + ' API returned invalid JSON: ' + error.message);
           }
         }
 
@@ -1098,15 +1202,25 @@
           retrieveDataset('templates')
         ]);
 
-        const migrationResult = replaceTasksLocally(results[0], results[1]);
+        const migrationResult = replaceTasksLocally(results[0], results[1], diagnostics);
+        diagnostics.stage = 'complete';
+        diagnostics.completedAt = new Date().toISOString();
 
         updateView('Migrated todo tasks and templates into local storage.', {
           migration: migrationResult,
-          todo: results[0],
-          templates: results[1]
+          diagnostics: diagnostics
         });
       } catch (error) {
-        updateView('Error retrieving migration data from YSTasks: ' + error.message, '');
+        diagnostics.failedAt = new Date().toISOString();
+        diagnostics.error = {
+          name: error.name || 'Error',
+          message: error.message || String(error),
+          stack: error.stack || null
+        };
+        updateView(
+          'Migration failed at stage "' + diagnostics.stage + '": ' + diagnostics.error.message,
+          diagnostics
+        );
       } finally {
         button.disabled = false;
       }
