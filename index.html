@@ -532,6 +532,9 @@
                 if (window.ensureStorageInitialized) {
                     window.ensureStorageInitialized();
                 }
+                if (window.checkDailyTrigger) {
+                    window.checkDailyTrigger();
+                }
                 exec_update(task_readall);
             }
 

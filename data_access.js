@@ -239,21 +239,9 @@
   }
 
   function checkDailyTrigger() {
-    const today = new Date();
-    const todayString = today.toISOString().slice(0, 10);
-    const storedDate = readDateFromLocalStorage();
-
-    if (!storedDate) {
-      saveDateToLocalStorage(todayString);
-      return taskReschedule();
-    }
-
-    if (storedDate !== todayString) {
-      saveDateToLocalStorage(todayString);
-      return taskReschedule();
-    }
-
-    return false;
+    // taskReschedule performs the once-per-day check itself. Calling it on
+    // every page load also allows a page opened before 6am to try again later.
+    return taskReschedule();
   }
 
   function getLocalStorageDataForDownload() {
