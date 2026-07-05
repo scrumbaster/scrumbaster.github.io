@@ -871,7 +871,7 @@
         </script>
     </div>
   <script src="data.js"></script>
-  <script src="data_access.js?v=20260704-2"></script>
+  <script src="data_access.js?v=20260705-2"></script>
   <script>
     function updateView(statusMessage, outputValue) {
       const statusEl = document.getElementById('status');
@@ -961,7 +961,7 @@
     function handleCheckDailyTrigger() {
       try {
         const shouldTrigger = window.checkDailyTrigger();
-        const currentDate = new Date().toISOString().slice(0, 10);
+        const currentDate = window.getCurrentDate().toISOString().slice(0, 10);
         updateView('Daily trigger check complete.', {
           shouldTrigger: shouldTrigger,
           currentDate: currentDate,
@@ -987,7 +987,7 @@
         const taskName = document.getElementById('task-name-input').value;
         const intervalInput = document.getElementById('interval_range');
         const recurrenceInput = document.querySelector('input[name="recuring"]:checked');
-        const currentDate = new Date().toISOString().slice(0, 10);
+        const currentDate = window.getCurrentDate().toISOString().slice(0, 10);
         const intervalValue = intervalInput ? intervalInput.value : '';
         const taskType = recurrenceInput ? recurrenceInput.value : '';
         const result = window.addTemplate(taskName, intervalValue, taskType, currentDate);

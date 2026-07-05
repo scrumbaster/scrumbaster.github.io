@@ -342,7 +342,7 @@
         }
     </style>
     <script src="data.js"></script>
-    <script src="data_access.js?v=20260704-2"></script>
+    <script src="data_access.js?v=20260705-2"></script>
 </head>
 <body onload="init_local_data_and_refresh()">
 
@@ -1773,7 +1773,7 @@
                     task_name = task_name_recurrence_dlg.innerText;
                     try {
                         if (window.addTemplate) {
-                            window.addTemplate(task_name, values[0], task_type, new Date().toISOString().slice(0, 10));
+                            window.addTemplate(task_name, values[0], task_type, window.getCurrentDate().toISOString().slice(0, 10));
                             confirm_recurrence_no();
                         } else {
                             alert('Local data layer unavailable.');

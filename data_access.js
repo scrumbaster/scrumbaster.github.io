@@ -1,6 +1,14 @@
 (function (global) {
   const STORAGE_KEY = "db";
 
+  function getCurrentDate() {
+    if (typeof global.CurrentDate !== "undefined") {
+      return global.CurrentDate;
+    }
+
+    return new Date();
+  }
+
   function getSourceData() {
     if (typeof global.data !== "undefined") {
       return global.data;
@@ -128,7 +136,7 @@
       stored.task_template = {};
     }
 
-    const now = new Date();
+    const now = getCurrentDate();
     const todayString = formatDateToString(now);
     const storedDate = stored.settings.CURDATE && stored.settings.CURDATE.val ? stored.settings.CURDATE.val : null;
     const currentHour = now.getHours();
@@ -380,7 +388,7 @@
       stored.task_todo = {};
     }
 
-    const today = new Date().toISOString().slice(0, 10);
+    const today = getCurrentDate().toISOString().slice(0, 10);
     stored.task_todo[taskName] = Object.assign({}, stored.task_todo[taskName] || { lud: today, tc: 0 }, {
       lud: stored.task_todo[taskName] && stored.task_todo[taskName].lud ? stored.task_todo[taskName].lud : today,
       tc: Number(completionValue)
@@ -404,7 +412,7 @@
       stored.task_todo = {};
     }
 
-    const today = new Date().toISOString().slice(0, 10);
+    const today = getCurrentDate().toISOString().slice(0, 10);
     stored.task_todo[taskName] = { lud: today, tc: 0 };
 
     if (!global.localStorage) {
@@ -517,6 +525,7 @@
 
   global.DataAccess = {
     STORAGE_KEY,
+    getCurrentDate,
     saveDataToLocalStorage,
     loadFromLocalStorage,
     clearLocalStorage,
@@ -539,6 +548,7 @@
   };
 
   global.saveDataToLocalStorage = saveDataToLocalStorage;
+  global.getCurrentDate = getCurrentDate;
   global.loadFromLocalStorage = loadFromLocalStorage;
   global.clearLocalStorage = clearLocalStorage;
   global.getTaskTemplateOnly = getTaskTemplateOnly;
