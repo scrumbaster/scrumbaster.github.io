@@ -149,86 +149,114 @@
       return { success: true, skipped: true, reason: "before_6am", date: todayString };
     }
 
-    const yesterdayDate = new Date(now);
-    yesterdayDate.setUTCDate(yesterdayDate.getUTCDate() - 1);
-    const yesterdayString = formatDateToString(yesterdayDate);
-
-    stored.settings.CURDATE = { val: todayString };
-
     const updatedTaskNames = [];
-    Object.keys(stored.task_todo).forEach(function (taskName) {
-      const task = stored.task_todo[taskName];
-      if (task && task.lud === todayString) {
-        task.lud = yesterdayString;
-        updatedTaskNames.push(taskName);
-      }
-    });
-
-    Object.keys(stored.task_template).forEach(function (taskName) {
-      const template = stored.task_template[taskName];
-      const todoItem = stored.task_todo[taskName];
-      if (template && todoItem && todoItem.lud) {
-        template.lcd = todoItem.lud;
-      }
-    });
-
     const deletedTaskNames = [];
-    Object.keys(stored.task_todo).forEach(function (taskName) {
-      const task = stored.task_todo[taskName];
-      if (task && Number(task.tc) === 5) {
-        delete stored.task_todo[taskName];
-        deletedTaskNames.push(taskName);
-      }
-    });
-
     const insertedTaskNames = [];
-    const existingTaskNames = Object.keys(stored.task_todo);
+    const processedDates = [];
+    const dailyResults = [];
 
-    Object.keys(stored.task_template).forEach(function (taskName) {
-      const template = stored.task_template[taskName];
-      if (!template || existingTaskNames.indexOf(taskName) !== -1) {
-        return;
+    function addUnique(list, taskName) {
+      if (list.indexOf(taskName) === -1) {
+        list.push(taskName);
+      }
+    }
+
+    function parseLocalDate(dateString) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString || "")) {
+        return null;
       }
 
-      if (template.tt === "DaysFromPrev") {
-        const difference = getDaysDifference(template.lcd, todayString);
-        if (difference !== null && difference > Number(template.int)) {
-          stored.task_todo[taskName] = { lud: todayString, tc: 0 };
-          existingTaskNames.push(taskName);
-          insertedTaskNames.push(taskName);
+      const parts = dateString.split("-").map(Number);
+      const date = new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0, 0);
+      if (date.getFullYear() !== parts[0]
+        || date.getMonth() !== parts[1] - 1
+        || date.getDate() !== parts[2]) {
+        return null;
+      }
+      return date;
+    }
+
+    let processingDate = parseLocalDate(storedDate);
+    if (processingDate && storedDate < todayString) {
+      processingDate.setDate(processingDate.getDate() + 1);
+    } else {
+      processingDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12, 0, 0, 0);
+    }
+
+    while (formatDateToString(processingDate) <= todayString) {
+      const processingDateString = formatDateToString(processingDate);
+      const previousDate = new Date(processingDate.getTime());
+      previousDate.setDate(previousDate.getDate() - 1);
+      const previousDateString = formatDateToString(previousDate);
+      const dayResult = {
+        date: processingDateString,
+        updatedTaskNames: [],
+        deletedTaskNames: [],
+        insertedTaskNames: []
+      };
+
+      stored.settings.CURDATE = { val: processingDateString };
+
+      Object.keys(stored.task_todo).forEach(function (taskName) {
+        const task = stored.task_todo[taskName];
+        if (task && task.lud === processingDateString) {
+          task.lud = previousDateString;
+          dayResult.updatedTaskNames.push(taskName);
+          addUnique(updatedTaskNames, taskName);
         }
-        return;
-      }
+      });
 
-      if (template.tt === "Yearly") {
-        const monthDay = Number(todayString.slice(5, 7)) * 100 + Number(todayString.slice(8, 10));
-        if (monthDay === Number(template.int)) {
-          stored.task_todo[taskName] = { lud: todayString, tc: 0 };
-          existingTaskNames.push(taskName);
-          insertedTaskNames.push(taskName);
+      Object.keys(stored.task_template).forEach(function (taskName) {
+        const template = stored.task_template[taskName];
+        const todoItem = stored.task_todo[taskName];
+        if (template && todoItem && todoItem.lud) {
+          template.lcd = todoItem.lud;
         }
-        return;
-      }
+      });
 
-      if (template.tt === "Monthly") {
-        const dayOfMonth = Number(todayString.slice(8, 10));
-        if (dayOfMonth === Number(template.int)) {
-          stored.task_todo[taskName] = { lud: todayString, tc: 0 };
-          existingTaskNames.push(taskName);
-          insertedTaskNames.push(taskName);
+      Object.keys(stored.task_todo).forEach(function (taskName) {
+        const task = stored.task_todo[taskName];
+        if (task && Number(task.tc) === 5) {
+          delete stored.task_todo[taskName];
+          dayResult.deletedTaskNames.push(taskName);
+          addUnique(deletedTaskNames, taskName);
         }
-        return;
-      }
+      });
 
-      if (template.tt === "Weekly") {
-        const dayOfWeek = now.getDay() + 1;
-        if (dayOfWeek === Number(template.int)) {
-          stored.task_todo[taskName] = { lud: todayString, tc: 0 };
-          existingTaskNames.push(taskName);
-          insertedTaskNames.push(taskName);
+      const existingTaskNames = Object.keys(stored.task_todo);
+      Object.keys(stored.task_template).forEach(function (taskName) {
+        const template = stored.task_template[taskName];
+        if (!template || existingTaskNames.indexOf(taskName) !== -1) {
+          return;
         }
-      }
-    });
+
+        let shouldInsert = false;
+
+        if (template.tt === "DaysFromPrev") {
+          const difference = getDaysDifference(template.lcd, processingDateString);
+          shouldInsert = difference !== null && difference >= Number(template.int);
+        } else if (template.tt === "Yearly") {
+          const monthDay = Number(processingDateString.slice(5, 7)) * 100
+            + Number(processingDateString.slice(8, 10));
+          shouldInsert = monthDay === Number(template.int);
+        } else if (template.tt === "Monthly") {
+          shouldInsert = Number(processingDateString.slice(8, 10)) === Number(template.int);
+        } else if (template.tt === "Weekly") {
+          shouldInsert = processingDate.getDay() + 1 === Number(template.int);
+        }
+
+        if (shouldInsert) {
+          stored.task_todo[taskName] = { lud: processingDateString, tc: 0 };
+          existingTaskNames.push(taskName);
+          dayResult.insertedTaskNames.push(taskName);
+          addUnique(insertedTaskNames, taskName);
+        }
+      });
+
+      processedDates.push(processingDateString);
+      dailyResults.push(dayResult);
+      processingDate.setDate(processingDate.getDate() + 1);
+    }
 
     global.localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
 
@@ -238,7 +266,9 @@
       date: todayString,
       updatedTaskNames,
       deletedTaskNames,
-      insertedTaskNames
+      insertedTaskNames,
+      processedDates,
+      dailyResults
     };
   }
 
@@ -316,64 +346,6 @@
     });
   }
 
-  function replaceTasksFromMigration(todoRows, templateRows) {
-    if (!Array.isArray(todoRows) || !Array.isArray(templateRows)) {
-      throw new Error("Migration data must contain todo and template lists.");
-    }
-
-    const taskTodo = {};
-    todoRows.forEach(function (row) {
-      if (!row || typeof row.task_name !== "string" || !row.task_name.trim()) {
-        throw new Error("A migrated todo row is missing task_name.");
-      }
-
-      const completionValue = row.task_completed !== undefined
-        ? row.task_completed
-        : row.tc;
-      const parsedCompletion = Number(completionValue);
-
-      if (!Number.isFinite(parsedCompletion)) {
-        throw new Error("Invalid task_completed value for " + row.task_name + ".");
-      }
-
-      taskTodo[row.task_name] = {
-        lud: row.last_updated_date || row.lud || null,
-        tc: parsedCompletion
-      };
-    });
-
-    const taskTemplate = {};
-    templateRows.forEach(function (row) {
-      if (!row || typeof row.task_name !== "string" || !row.task_name.trim()) {
-        throw new Error("A migrated template row is missing task_name.");
-      }
-
-      const intervalValue = row.interval !== undefined ? row.interval : row.int;
-      const parsedInterval = Number(intervalValue);
-
-      if (!Number.isFinite(parsedInterval)) {
-        throw new Error("Invalid interval value for " + row.task_name + ".");
-      }
-
-      taskTemplate[row.task_name] = {
-        int: parsedInterval,
-        lcd: row.last_completed_date || row.lcd || null,
-        tt: row.task_type || row.tt || ""
-      };
-    });
-
-    const stored = ensureStorageInitialized() || {};
-    stored.task_todo = taskTodo;
-    stored.task_template = taskTemplate;
-    global.localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
-
-    return {
-      success: true,
-      todoCount: Object.keys(taskTodo).length,
-      templateCount: Object.keys(taskTemplate).length
-    };
-  }
-
   function updateTaskCompletion(taskName, completionValue) {
     if (!taskName) {
       throw new Error("A task name is required.");
@@ -390,7 +362,7 @@
 
     const today = getCurrentDate().toISOString().slice(0, 10);
     stored.task_todo[taskName] = Object.assign({}, stored.task_todo[taskName] || { lud: today, tc: 0 }, {
-      lud: stored.task_todo[taskName] && stored.task_todo[taskName].lud ? stored.task_todo[taskName].lud : today,
+      lud: today,
       tc: Number(completionValue)
     });
 
@@ -538,7 +510,6 @@
     ensureStorageInitialized,
     getTaskItemsForUi,
     getTaskTemplatesInfo,
-    replaceTasksFromMigration,
     updateTaskCompletion,
     addTaskToTodo,
     addTemplate,
@@ -561,7 +532,6 @@
   global.ensureStorageInitialized = ensureStorageInitialized;
   global.getTaskItemsForUi = getTaskItemsForUi;
   global.getTaskTemplatesInfo = getTaskTemplatesInfo;
-  global.replaceTasksFromMigration = replaceTasksFromMigration;
   global.updateTaskCompletion = updateTaskCompletion;
   global.addTaskToTodo = addTaskToTodo;
   global.addTemplate = addTemplate;

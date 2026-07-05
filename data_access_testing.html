@@ -13,10 +13,13 @@
 <body>
   <h1>Local Storage Test</h1>
 
+  <button id="back-to-tasks-button" type="button">Back to Tasks</button>
   <button id="save-data-button" type="button">Save data.js to local storage</button>
   <button id="read-data-button" type="button">Read local storage and display</button>
   <button id="clear-data-button" type="button">Clear local storage</button>
   <button id="task-template-button" type="button">Return task_template only</button>
+  <button id="task-items-ui-button" type="button">Test getTaskItemsForUi</button>
+  <button id="template-info-ui-button" type="button">Test getTaskTemplatesInfo</button>
   <input id="date-picker" type="date" />
   <button id="save-date-button" type="button">Save Date</button>
   <button id="read-date-button" type="button">Read Date</button>
@@ -27,6 +30,11 @@
   <button id="delete-task-button" type="button">Delete Task</button>
   <button id="delete-template-button" type="button">Delete Template</button>
   <button id="retrieve-api-todo-button" type="button">Retrieve API Data (Migration)</button>
+  <button id="run-repeat-five-day-test-button" type="button">Run Test 1: Repeat Every 5 Days</button>
+  <button id="run-weekly-test-button" type="button">Run Test 2: Weekly Task</button>
+  <button id="run-monthly-test-button" type="button">Run Test 3: Monthly Task</button>
+  <button id="run-yearly-test-button" type="button">Run Test 4: Yearly Task</button>
+  <button id="run-skipped-days-test-button" type="button">Run Test 5: Skipped Days</button>
   <button id="download-data-button" type="button">Download local storage as data.js</button>
 
   <p id="status">No action taken yet.</p>
@@ -871,7 +879,7 @@
         </script>
     </div>
   <script src="data.js"></script>
-  <script src="data_access.js?v=20260705-2"></script>
+  <script src="data_access.js?v=20260705-6"></script>
   <script>
     function updateView(statusMessage, outputValue) {
       const statusEl = document.getElementById('status');
@@ -1014,6 +1022,1088 @@
         updateView('Delete template completed.', result);
       } catch (error) {
         updateView('Error deleting template: ' + error.message, '');
+      }
+    }
+
+    function handleTaskItemsForUi() {
+      try {
+        const items = window.getTaskItemsForUi();
+        updateView('getTaskItemsForUi completed: ' + items.length + ' task(s).', {
+          functionName: 'getTaskItemsForUi',
+          count: items.length,
+          items: items
+        });
+      } catch (error) {
+        updateView('getTaskItemsForUi failed: ' + error.message, {
+          name: error.name || 'Error',
+          message: error.message || String(error),
+          stack: error.stack || null
+        });
+      }
+    }
+
+    function handleTaskTemplatesInfo() {
+      try {
+        const templates = window.getTaskTemplatesInfo();
+        updateView('getTaskTemplatesInfo completed: ' + templates.length + ' template(s).', {
+          functionName: 'getTaskTemplatesInfo',
+          count: templates.length,
+          templates: templates
+        });
+      } catch (error) {
+        updateView('getTaskTemplatesInfo failed: ' + error.message, {
+          name: error.name || 'Error',
+          message: error.message || String(error),
+          stack: error.stack || null
+        });
+      }
+    }
+
+    function handleRepeatFiveDayTest() {
+      const taskName = '🏠↻Repeat every 5 days';
+      const totalDays = 30;
+      const completionDelays = [0, 2, 7];
+      const button = document.getElementById('run-repeat-five-day-test-button');
+
+      if (!window.confirm(
+        'This test will clear the local todo and template lists. Continue?'
+      )) {
+        updateView('Test 1 cancelled. No data was changed.', '');
+        return;
+      }
+
+      button.disabled = true;
+      const report = {
+        test: 'Repeat every 5 days',
+        taskName: taskName,
+        totalDays: totalDays,
+        completionPlan: {
+          cycle1: 'complete on appearance day',
+          cycle2: 'keep in progress for 2 days, then complete',
+          cycle3: 'keep in progress for 7 days, then complete',
+          laterCycles: 'repeat the same 0, 2, 7 day pattern'
+        },
+        assertions: [],
+        days: []
+      };
+
+      let originalSettings;
+
+      function clone(value) {
+        return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
+      }
+
+      function dateKey(date) {
+        return date.toISOString().slice(0, 10);
+      }
+
+      function addDays(date, numberOfDays) {
+        const result = new Date(date.getTime());
+        result.setDate(result.getDate() + numberOfDays);
+        return result;
+      }
+
+      function readTestTask() {
+        const stored = window.loadFromLocalStorage() || {};
+        return stored.task_todo && stored.task_todo[taskName]
+          ? clone(stored.task_todo[taskName])
+          : null;
+      }
+
+      try {
+        const realNow = new Date();
+        const startDate = new Date(
+          realNow.getFullYear(),
+          realNow.getMonth(),
+          realNow.getDate(),
+          12, 0, 0, 0
+        );
+        report.startDate = dateKey(startDate);
+        report.endDate = dateKey(addDays(startDate, totalDays - 1));
+
+        const stored = window.ensureStorageInitialized() || {};
+        originalSettings = clone(stored.settings || {});
+        stored.task_todo = {};
+        stored.task_template = {};
+        stored.settings = stored.settings || {};
+        stored.settings.CURDATE = { val: dateKey(addDays(startDate, -1)) };
+        localStorage.setItem('db', JSON.stringify(stored));
+
+        let appearanceNumber = 0;
+        let activeAppearanceDate = null;
+        let activeCompletionDelay = null;
+        let expectedNextAppearance = null;
+
+        for (let dayIndex = 0; dayIndex < totalDays; dayIndex++) {
+          const simulatedDate = addDays(startDate, dayIndex);
+          window.CurrentDate = simulatedDate;
+          const today = dateKey(simulatedDate);
+          const dayLog = {
+            day: dayIndex + 1,
+            date: today,
+            currentDateGlobal: window.CurrentDate.toString(),
+            expectedAppearance: expectedNextAppearance,
+            beforeOpen: readTestTask()
+          };
+
+          const triggerResult = window.checkDailyTrigger();
+          dayLog.openIndexResult = clone(triggerResult);
+          dayLog.afterOpen = readTestTask();
+
+          const insertedToday = Boolean(
+            triggerResult
+            && Array.isArray(triggerResult.insertedTaskNames)
+            && triggerResult.insertedTaskNames.indexOf(taskName) !== -1
+          );
+
+          if (dayIndex === 0) {
+            window.addTemplate(taskName, 5, 'DaysFromPrev', today);
+            window.addTaskToTodo(taskName);
+            appearanceNumber = 1;
+            activeAppearanceDate = simulatedDate;
+            activeCompletionDelay = completionDelays[0];
+            dayLog.event = 'Template created; task initially added to todo.';
+            dayLog.templateCreated = clone(
+              window.loadFromLocalStorage().task_template[taskName]
+            );
+          } else if (insertedToday) {
+            appearanceNumber++;
+            activeAppearanceDate = simulatedDate;
+            activeCompletionDelay = completionDelays[
+              (appearanceNumber - 1) % completionDelays.length
+            ];
+            dayLog.event = 'Recurring task appeared in todo.';
+            dayLog.appearanceNumber = appearanceNumber;
+
+            const appearancePassed = today === expectedNextAppearance;
+            report.assertions.push({
+              type: 'appearance_date',
+              appearanceNumber: appearanceNumber,
+              expected: expectedNextAppearance,
+              actual: today,
+              passed: appearancePassed
+            });
+          }
+
+          if (expectedNextAppearance === today && !insertedToday) {
+            report.assertions.push({
+              type: 'missing_expected_appearance',
+              expected: today,
+              actualTaskState: readTestTask(),
+              passed: false
+            });
+            dayLog.expectedAppearanceMissing = true;
+          }
+
+          const currentTask = readTestTask();
+          if (currentTask && Number(currentTask.tc) !== 5 && activeAppearanceDate) {
+            const daysActive = Math.round(
+              (simulatedDate - activeAppearanceDate) / (24 * 60 * 60 * 1000)
+            );
+            dayLog.daysSinceAppearance = daysActive;
+            dayLog.plannedCompletionDelay = activeCompletionDelay;
+
+            if (daysActive >= activeCompletionDelay) {
+              window.updateTaskCompletion(taskName, 5);
+              expectedNextAppearance = dateKey(addDays(simulatedDate, 5));
+              dayLog.userAction = 'Completed task.';
+              dayLog.nextAppearanceExpected = expectedNextAppearance;
+              activeAppearanceDate = null;
+              activeCompletionDelay = null;
+            } else {
+              window.updateTaskCompletion(taskName, 2);
+              dayLog.userAction = 'Kept task in progress.';
+            }
+          } else if (!dayLog.userAction) {
+            dayLog.userAction = currentTask
+              ? 'Task remains completed until next daily reschedule.'
+              : 'No task available.';
+          }
+
+          const finalStored = window.loadFromLocalStorage() || {};
+          dayLog.endOfDayTask = readTestTask();
+          dayLog.endOfDayTemplate = finalStored.task_template
+            ? clone(finalStored.task_template[taskName])
+            : null;
+          dayLog.storedCurrentDate = finalStored.settings
+            && finalStored.settings.CURDATE
+            ? finalStored.settings.CURDATE.val
+            : null;
+          report.days.push(dayLog);
+        }
+
+        const passedAssertions = report.assertions.filter(function (item) {
+          return item.passed;
+        }).length;
+        report.summary = {
+          appearancesObserved: appearanceNumber,
+          assertions: report.assertions.length,
+          passed: passedAssertions,
+          failed: report.assertions.length - passedAssertions,
+          result: passedAssertions === report.assertions.length ? 'PASS' : 'FAIL'
+        };
+        updateView(
+          'Test 1 completed: ' + report.summary.result + '. Migration is required to restore tasks.',
+          report
+        );
+      } catch (error) {
+        report.error = {
+          name: error.name || 'Error',
+          message: error.message || String(error),
+          stack: error.stack || null
+        };
+        updateView('Test 1 failed to execute: ' + report.error.message, report);
+      } finally {
+        delete window.CurrentDate;
+
+        try {
+          const finalData = window.loadFromLocalStorage() || {};
+          finalData.settings = originalSettings || {};
+          localStorage.setItem('db', JSON.stringify(finalData));
+        } catch (restoreError) {
+          report.settingsRestoreError = restoreError.message || String(restoreError);
+          updateView('Test completed, but restoring settings failed.', report);
+        }
+
+        button.disabled = false;
+      }
+    }
+
+    function handleWeeklyTaskTest() {
+      const taskName = '🏠↻Weekly task';
+      const totalDays = 30;
+      const completionDelays = [0, 2, 9];
+      const button = document.getElementById('run-weekly-test-button');
+
+      if (!window.confirm(
+        'This test will clear the local todo and template lists. Continue?'
+      )) {
+        updateView('Test 2 cancelled. No data was changed.', '');
+        return;
+      }
+
+      button.disabled = true;
+      const report = {
+        test: 'Weekly task',
+        taskName: taskName,
+        totalDays: totalDays,
+        completionPlan: {
+          cycle1: 'complete on appearance day',
+          cycle2: 'keep in progress for 2 days, then complete',
+          cycle3: 'keep in progress for 9 days, crossing the next weekly date',
+          laterCycles: 'repeat the same 0, 2, 9 day pattern'
+        },
+        assertions: [],
+        days: []
+      };
+
+      let originalSettings;
+
+      function clone(value) {
+        return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
+      }
+
+      function dateKey(date) {
+        return date.toISOString().slice(0, 10);
+      }
+
+      function addDays(date, numberOfDays) {
+        const result = new Date(date.getTime());
+        result.setDate(result.getDate() + numberOfDays);
+        return result;
+      }
+
+      function readTestTask() {
+        const stored = window.loadFromLocalStorage() || {};
+        return stored.task_todo && stored.task_todo[taskName]
+          ? clone(stored.task_todo[taskName])
+          : null;
+      }
+
+      try {
+        const realNow = new Date();
+        const startDate = new Date(
+          realNow.getFullYear(),
+          realNow.getMonth(),
+          realNow.getDate(),
+          12, 0, 0, 0
+        );
+        const weeklyInterval = startDate.getDay() + 1;
+        const weekdayNames = [
+          'Sunday', 'Monday', 'Tuesday', 'Wednesday',
+          'Thursday', 'Friday', 'Saturday'
+        ];
+        report.startDate = dateKey(startDate);
+        report.endDate = dateKey(addDays(startDate, totalDays - 1));
+        report.weeklyInterval = weeklyInterval;
+        report.scheduledWeekday = weekdayNames[startDate.getDay()];
+
+        const stored = window.ensureStorageInitialized() || {};
+        originalSettings = clone(stored.settings || {});
+        stored.task_todo = {};
+        stored.task_template = {};
+        stored.settings = stored.settings || {};
+        stored.settings.CURDATE = { val: dateKey(addDays(startDate, -1)) };
+        localStorage.setItem('db', JSON.stringify(stored));
+
+        let appearanceNumber = 0;
+        let activeAppearanceDate = null;
+        let activeCompletionDelay = null;
+
+        for (let dayIndex = 0; dayIndex < totalDays; dayIndex++) {
+          const simulatedDate = addDays(startDate, dayIndex);
+          window.CurrentDate = simulatedDate;
+          const today = dateKey(simulatedDate);
+          const isScheduledWeekday = simulatedDate.getDay() + 1 === weeklyInterval;
+          const taskBeforeOpen = readTestTask();
+          const dayLog = {
+            day: dayIndex + 1,
+            date: today,
+            weekday: weekdayNames[simulatedDate.getDay()],
+            scheduledWeekday: isScheduledWeekday,
+            currentDateGlobal: window.CurrentDate.toString(),
+            beforeOpen: taskBeforeOpen
+          };
+
+          const triggerResult = window.checkDailyTrigger();
+          dayLog.openIndexResult = clone(triggerResult);
+          dayLog.afterOpen = readTestTask();
+
+          const insertedToday = Boolean(
+            triggerResult
+            && Array.isArray(triggerResult.insertedTaskNames)
+            && triggerResult.insertedTaskNames.indexOf(taskName) !== -1
+          );
+
+          if (dayIndex === 0) {
+            window.addTemplate(taskName, weeklyInterval, 'Weekly', today);
+            window.addTaskToTodo(taskName);
+            appearanceNumber = 1;
+            activeAppearanceDate = simulatedDate;
+            activeCompletionDelay = completionDelays[0];
+            dayLog.event = 'Weekly template created; task initially added to todo.';
+          } else {
+            report.assertions.push({
+              type: 'no_off_schedule_insertion',
+              date: today,
+              scheduledWeekday: isScheduledWeekday,
+              inserted: insertedToday,
+              passed: isScheduledWeekday || !insertedToday
+            });
+
+            if (isScheduledWeekday) {
+              const shouldInsert = !taskBeforeOpen || Number(taskBeforeOpen.tc) === 5;
+              report.assertions.push({
+                type: shouldInsert
+                  ? 'scheduled_weekly_appearance'
+                  : 'no_duplicate_while_task_active',
+                date: today,
+                taskBeforeOpen: taskBeforeOpen,
+                expectedInsertion: shouldInsert,
+                actualInsertion: insertedToday,
+                passed: insertedToday === shouldInsert
+              });
+            }
+
+            if (insertedToday) {
+              appearanceNumber++;
+              activeAppearanceDate = simulatedDate;
+              activeCompletionDelay = completionDelays[
+                (appearanceNumber - 1) % completionDelays.length
+              ];
+              dayLog.event = 'Weekly task appeared in todo.';
+              dayLog.appearanceNumber = appearanceNumber;
+            }
+          }
+
+          const currentTask = readTestTask();
+          if (currentTask && Number(currentTask.tc) !== 5 && activeAppearanceDate) {
+            const daysActive = Math.round(
+              (simulatedDate - activeAppearanceDate) / (24 * 60 * 60 * 1000)
+            );
+            dayLog.daysSinceAppearance = daysActive;
+            dayLog.plannedCompletionDelay = activeCompletionDelay;
+
+            if (daysActive >= activeCompletionDelay) {
+              window.updateTaskCompletion(taskName, 5);
+              dayLog.userAction = 'Completed task.';
+              activeAppearanceDate = null;
+              activeCompletionDelay = null;
+            } else {
+              window.updateTaskCompletion(taskName, 2);
+              dayLog.userAction = 'Kept task in progress.';
+            }
+          } else if (!dayLog.userAction) {
+            dayLog.userAction = currentTask
+              ? 'Task remains completed until next daily reschedule.'
+              : 'No task available.';
+          }
+
+          const finalStored = window.loadFromLocalStorage() || {};
+          dayLog.endOfDayTask = readTestTask();
+          dayLog.endOfDayTemplate = finalStored.task_template
+            ? clone(finalStored.task_template[taskName])
+            : null;
+          dayLog.storedCurrentDate = finalStored.settings
+            && finalStored.settings.CURDATE
+            ? finalStored.settings.CURDATE.val
+            : null;
+          report.days.push(dayLog);
+        }
+
+        const passedAssertions = report.assertions.filter(function (item) {
+          return item.passed;
+        }).length;
+        report.summary = {
+          appearancesObserved: appearanceNumber,
+          assertions: report.assertions.length,
+          passed: passedAssertions,
+          failed: report.assertions.length - passedAssertions,
+          result: passedAssertions === report.assertions.length ? 'PASS' : 'FAIL'
+        };
+        updateView(
+          'Test 2 completed: ' + report.summary.result + '. Migration is required to restore tasks.',
+          report
+        );
+      } catch (error) {
+        report.error = {
+          name: error.name || 'Error',
+          message: error.message || String(error),
+          stack: error.stack || null
+        };
+        updateView('Test 2 failed to execute: ' + report.error.message, report);
+      } finally {
+        delete window.CurrentDate;
+
+        try {
+          const finalData = window.loadFromLocalStorage() || {};
+          finalData.settings = originalSettings || {};
+          localStorage.setItem('db', JSON.stringify(finalData));
+        } catch (restoreError) {
+          report.settingsRestoreError = restoreError.message || String(restoreError);
+          updateView('Test completed, but restoring settings failed.', report);
+        }
+
+        button.disabled = false;
+      }
+    }
+
+    function handleMonthlyTaskTest() {
+      const taskName = '🏠↻Monthly task';
+      const monthlyDay = 15;
+      const totalDays = 100;
+      const completionDelays = [0, 2, 35];
+      const button = document.getElementById('run-monthly-test-button');
+
+      if (!window.confirm(
+        'This test will clear the local todo and template lists. Continue?'
+      )) {
+        updateView('Test 3 cancelled. No data was changed.', '');
+        return;
+      }
+
+      button.disabled = true;
+      const report = {
+        test: 'Monthly task',
+        taskName: taskName,
+        monthlyDay: monthlyDay,
+        totalDays: totalDays,
+        completionPlan: {
+          cycle1: 'complete on appearance day',
+          cycle2: 'keep in progress for 2 days, then complete',
+          cycle3: 'keep in progress for 35 days, crossing the next monthly date',
+          laterCycles: 'repeat the same 0, 2, 35 day pattern'
+        },
+        assertions: [],
+        days: []
+      };
+
+      let originalSettings;
+
+      function clone(value) {
+        return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
+      }
+
+      function dateKey(date) {
+        return date.toISOString().slice(0, 10);
+      }
+
+      function addDays(date, numberOfDays) {
+        const result = new Date(date.getTime());
+        result.setDate(result.getDate() + numberOfDays);
+        return result;
+      }
+
+      function readTestTask() {
+        const stored = window.loadFromLocalStorage() || {};
+        return stored.task_todo && stored.task_todo[taskName]
+          ? clone(stored.task_todo[taskName])
+          : null;
+      }
+
+      try {
+        const realNow = new Date();
+        const startDate = new Date(
+          realNow.getFullYear(),
+          realNow.getMonth(),
+          monthlyDay,
+          12, 0, 0, 0
+        );
+        report.startDate = dateKey(startDate);
+        report.endDate = dateKey(addDays(startDate, totalDays - 1));
+
+        const stored = window.ensureStorageInitialized() || {};
+        originalSettings = clone(stored.settings || {});
+        stored.task_todo = {};
+        stored.task_template = {};
+        stored.settings = stored.settings || {};
+        stored.settings.CURDATE = { val: dateKey(addDays(startDate, -1)) };
+        localStorage.setItem('db', JSON.stringify(stored));
+
+        let appearanceNumber = 0;
+        let activeAppearanceDate = null;
+        let activeCompletionDelay = null;
+
+        for (let dayIndex = 0; dayIndex < totalDays; dayIndex++) {
+          const simulatedDate = addDays(startDate, dayIndex);
+          window.CurrentDate = simulatedDate;
+          const today = dateKey(simulatedDate);
+          const isScheduledDay = simulatedDate.getDate() === monthlyDay;
+          const taskBeforeOpen = readTestTask();
+          const dayLog = {
+            day: dayIndex + 1,
+            date: today,
+            dayOfMonth: simulatedDate.getDate(),
+            scheduledDay: isScheduledDay,
+            currentDateGlobal: window.CurrentDate.toString(),
+            beforeOpen: taskBeforeOpen
+          };
+
+          const triggerResult = window.checkDailyTrigger();
+          dayLog.openIndexResult = clone(triggerResult);
+          dayLog.afterOpen = readTestTask();
+
+          const insertedToday = Boolean(
+            triggerResult
+            && Array.isArray(triggerResult.insertedTaskNames)
+            && triggerResult.insertedTaskNames.indexOf(taskName) !== -1
+          );
+
+          if (dayIndex === 0) {
+            window.addTemplate(taskName, monthlyDay, 'Monthly', today);
+            window.addTaskToTodo(taskName);
+            appearanceNumber = 1;
+            activeAppearanceDate = simulatedDate;
+            activeCompletionDelay = completionDelays[0];
+            dayLog.event = 'Monthly template created; task initially added to todo.';
+          } else {
+            report.assertions.push({
+              type: 'no_off_schedule_insertion',
+              date: today,
+              scheduledDay: isScheduledDay,
+              inserted: insertedToday,
+              passed: isScheduledDay || !insertedToday
+            });
+
+            if (isScheduledDay) {
+              const shouldInsert = !taskBeforeOpen || Number(taskBeforeOpen.tc) === 5;
+              report.assertions.push({
+                type: shouldInsert
+                  ? 'scheduled_monthly_appearance'
+                  : 'no_duplicate_while_task_active',
+                date: today,
+                taskBeforeOpen: taskBeforeOpen,
+                expectedInsertion: shouldInsert,
+                actualInsertion: insertedToday,
+                passed: insertedToday === shouldInsert
+              });
+            }
+
+            if (insertedToday) {
+              appearanceNumber++;
+              activeAppearanceDate = simulatedDate;
+              activeCompletionDelay = completionDelays[
+                (appearanceNumber - 1) % completionDelays.length
+              ];
+              dayLog.event = 'Monthly task appeared in todo.';
+              dayLog.appearanceNumber = appearanceNumber;
+            }
+          }
+
+          const currentTask = readTestTask();
+          if (currentTask && Number(currentTask.tc) !== 5 && activeAppearanceDate) {
+            const daysActive = Math.round(
+              (simulatedDate - activeAppearanceDate) / (24 * 60 * 60 * 1000)
+            );
+            dayLog.daysSinceAppearance = daysActive;
+            dayLog.plannedCompletionDelay = activeCompletionDelay;
+
+            if (daysActive >= activeCompletionDelay) {
+              window.updateTaskCompletion(taskName, 5);
+              dayLog.userAction = 'Completed task.';
+              activeAppearanceDate = null;
+              activeCompletionDelay = null;
+            } else {
+              window.updateTaskCompletion(taskName, 2);
+              dayLog.userAction = 'Kept task in progress.';
+            }
+          } else if (!dayLog.userAction) {
+            dayLog.userAction = currentTask
+              ? 'Task remains completed until next daily reschedule.'
+              : 'No task available.';
+          }
+
+          const finalStored = window.loadFromLocalStorage() || {};
+          dayLog.endOfDayTask = readTestTask();
+          dayLog.endOfDayTemplate = finalStored.task_template
+            ? clone(finalStored.task_template[taskName])
+            : null;
+          dayLog.storedCurrentDate = finalStored.settings
+            && finalStored.settings.CURDATE
+            ? finalStored.settings.CURDATE.val
+            : null;
+          report.days.push(dayLog);
+        }
+
+        const passedAssertions = report.assertions.filter(function (item) {
+          return item.passed;
+        }).length;
+        report.summary = {
+          appearancesObserved: appearanceNumber,
+          assertions: report.assertions.length,
+          passed: passedAssertions,
+          failed: report.assertions.length - passedAssertions,
+          result: passedAssertions === report.assertions.length ? 'PASS' : 'FAIL'
+        };
+        updateView(
+          'Test 3 completed: ' + report.summary.result + '. Migration is required to restore tasks.',
+          report
+        );
+      } catch (error) {
+        report.error = {
+          name: error.name || 'Error',
+          message: error.message || String(error),
+          stack: error.stack || null
+        };
+        updateView('Test 3 failed to execute: ' + report.error.message, report);
+      } finally {
+        delete window.CurrentDate;
+
+        try {
+          const finalData = window.loadFromLocalStorage() || {};
+          finalData.settings = originalSettings || {};
+          localStorage.setItem('db', JSON.stringify(finalData));
+        } catch (restoreError) {
+          report.settingsRestoreError = restoreError.message || String(restoreError);
+          updateView('Test completed, but restoring settings failed.', report);
+        }
+
+        button.disabled = false;
+      }
+    }
+
+    function handleYearlyTaskTest() {
+      const taskName = '🏠↻Yearly task';
+      const yearlyMonth = 7;
+      const yearlyDay = 15;
+      const yearlyInterval = 715;
+      const totalDays = 380;
+      const completionDelays = [0, 2];
+      const button = document.getElementById('run-yearly-test-button');
+
+      if (!window.confirm(
+        'This test will clear the local todo and template lists. Continue?'
+      )) {
+        updateView('Test 4 cancelled. No data was changed.', '');
+        return;
+      }
+
+      button.disabled = true;
+      const report = {
+        test: 'Yearly task',
+        taskName: taskName,
+        yearlyInterval: yearlyInterval,
+        scheduledDate: 'July 15',
+        totalDays: totalDays,
+        completionPlan: {
+          cycle1: 'complete on creation day',
+          cycle2: 'keep in progress for 2 days, then complete'
+        },
+        assertions: [],
+        days: []
+      };
+
+      let originalSettings;
+
+      function clone(value) {
+        return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
+      }
+
+      function dateKey(date) {
+        return date.toISOString().slice(0, 10);
+      }
+
+      function addDays(date, numberOfDays) {
+        const result = new Date(date.getTime());
+        result.setDate(result.getDate() + numberOfDays);
+        return result;
+      }
+
+      function readTestTask() {
+        const stored = window.loadFromLocalStorage() || {};
+        return stored.task_todo && stored.task_todo[taskName]
+          ? clone(stored.task_todo[taskName])
+          : null;
+      }
+
+      try {
+        const realNow = new Date();
+        const startDate = new Date(
+          realNow.getFullYear(),
+          yearlyMonth - 1,
+          yearlyDay,
+          12, 0, 0, 0
+        );
+        report.startDate = dateKey(startDate);
+        report.endDate = dateKey(addDays(startDate, totalDays - 1));
+
+        const stored = window.ensureStorageInitialized() || {};
+        originalSettings = clone(stored.settings || {});
+        stored.task_todo = {};
+        stored.task_template = {};
+        stored.settings = stored.settings || {};
+        stored.settings.CURDATE = { val: dateKey(addDays(startDate, -1)) };
+        localStorage.setItem('db', JSON.stringify(stored));
+
+        let appearanceNumber = 0;
+        let activeAppearanceDate = null;
+        let activeCompletionDelay = null;
+
+        for (let dayIndex = 0; dayIndex < totalDays; dayIndex++) {
+          const simulatedDate = addDays(startDate, dayIndex);
+          window.CurrentDate = simulatedDate;
+          const today = dateKey(simulatedDate);
+          const isScheduledDate = simulatedDate.getMonth() + 1 === yearlyMonth
+            && simulatedDate.getDate() === yearlyDay;
+          const taskBeforeOpen = readTestTask();
+          const dayLog = {
+            day: dayIndex + 1,
+            date: today,
+            scheduledDate: isScheduledDate,
+            currentDateGlobal: window.CurrentDate.toString(),
+            beforeOpen: taskBeforeOpen
+          };
+
+          const triggerResult = window.checkDailyTrigger();
+          dayLog.openIndexResult = clone(triggerResult);
+          dayLog.afterOpen = readTestTask();
+
+          const insertedToday = Boolean(
+            triggerResult
+            && Array.isArray(triggerResult.insertedTaskNames)
+            && triggerResult.insertedTaskNames.indexOf(taskName) !== -1
+          );
+
+          if (dayIndex === 0) {
+            window.addTemplate(taskName, yearlyInterval, 'Yearly', today);
+            window.addTaskToTodo(taskName);
+            appearanceNumber = 1;
+            activeAppearanceDate = simulatedDate;
+            activeCompletionDelay = completionDelays[0];
+            dayLog.event = 'Yearly template created; task initially added to todo.';
+          } else {
+            report.assertions.push({
+              type: 'no_off_schedule_insertion',
+              date: today,
+              scheduledDate: isScheduledDate,
+              inserted: insertedToday,
+              passed: isScheduledDate || !insertedToday
+            });
+
+            if (isScheduledDate) {
+              const shouldInsert = !taskBeforeOpen || Number(taskBeforeOpen.tc) === 5;
+              report.assertions.push({
+                type: shouldInsert
+                  ? 'scheduled_yearly_appearance'
+                  : 'no_duplicate_while_task_active',
+                date: today,
+                taskBeforeOpen: taskBeforeOpen,
+                expectedInsertion: shouldInsert,
+                actualInsertion: insertedToday,
+                passed: insertedToday === shouldInsert
+              });
+            }
+
+            if (insertedToday) {
+              appearanceNumber++;
+              activeAppearanceDate = simulatedDate;
+              activeCompletionDelay = completionDelays[
+                (appearanceNumber - 1) % completionDelays.length
+              ];
+              dayLog.event = 'Yearly task appeared in todo.';
+              dayLog.appearanceNumber = appearanceNumber;
+            }
+          }
+
+          const currentTask = readTestTask();
+          if (currentTask && Number(currentTask.tc) !== 5 && activeAppearanceDate) {
+            const daysActive = Math.round(
+              (simulatedDate - activeAppearanceDate) / (24 * 60 * 60 * 1000)
+            );
+            dayLog.daysSinceAppearance = daysActive;
+            dayLog.plannedCompletionDelay = activeCompletionDelay;
+
+            if (daysActive >= activeCompletionDelay) {
+              window.updateTaskCompletion(taskName, 5);
+              dayLog.userAction = 'Completed task.';
+              activeAppearanceDate = null;
+              activeCompletionDelay = null;
+            } else {
+              window.updateTaskCompletion(taskName, 2);
+              dayLog.userAction = 'Kept task in progress.';
+            }
+          } else if (!dayLog.userAction) {
+            dayLog.userAction = currentTask
+              ? 'Task remains completed until next daily reschedule.'
+              : 'No task available.';
+          }
+
+          const finalStored = window.loadFromLocalStorage() || {};
+          dayLog.endOfDayTask = readTestTask();
+          dayLog.endOfDayTemplate = finalStored.task_template
+            ? clone(finalStored.task_template[taskName])
+            : null;
+          dayLog.storedCurrentDate = finalStored.settings
+            && finalStored.settings.CURDATE
+            ? finalStored.settings.CURDATE.val
+            : null;
+          report.days.push(dayLog);
+        }
+
+        const passedAssertions = report.assertions.filter(function (item) {
+          return item.passed;
+        }).length;
+        report.summary = {
+          appearancesObserved: appearanceNumber,
+          assertions: report.assertions.length,
+          passed: passedAssertions,
+          failed: report.assertions.length - passedAssertions,
+          result: passedAssertions === report.assertions.length ? 'PASS' : 'FAIL'
+        };
+        updateView(
+          'Test 4 completed: ' + report.summary.result + '. Migration is required to restore tasks.',
+          report
+        );
+      } catch (error) {
+        report.error = {
+          name: error.name || 'Error',
+          message: error.message || String(error),
+          stack: error.stack || null
+        };
+        updateView('Test 4 failed to execute: ' + report.error.message, report);
+      } finally {
+        delete window.CurrentDate;
+
+        try {
+          const finalData = window.loadFromLocalStorage() || {};
+          finalData.settings = originalSettings || {};
+          localStorage.setItem('db', JSON.stringify(finalData));
+        } catch (restoreError) {
+          report.settingsRestoreError = restoreError.message || String(restoreError);
+          updateView('Test completed, but restoring settings failed.', report);
+        }
+
+        button.disabled = false;
+      }
+    }
+
+    function handleSkippedDaysTest() {
+      const button = document.getElementById('run-skipped-days-test-button');
+
+      if (!window.confirm(
+        'This test will clear the local todo and template lists. Continue?'
+      )) {
+        updateView('Test 5 cancelled. No data was changed.', '');
+        return;
+      }
+
+      button.disabled = true;
+      const report = {
+        test: 'Skipped days catch-up',
+        assertions: []
+      };
+      let originalSettings;
+
+      function clone(value) {
+        return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
+      }
+
+      function dateKey(date) {
+        return date.toISOString().slice(0, 10);
+      }
+
+      function addDays(date, numberOfDays) {
+        const result = new Date(date.getTime());
+        result.setDate(result.getDate() + numberOfDays);
+        return result;
+      }
+
+      function assertResult(type, expected, actual) {
+        const passed = JSON.stringify(expected) === JSON.stringify(actual);
+        report.assertions.push({
+          type: type,
+          expected: expected,
+          actual: actual,
+          passed: passed
+        });
+      }
+
+      try {
+        const startDate = new Date(2026, 0, 1, 12, 0, 0, 0);
+        const reopenDate = addDays(startDate, 7);
+        const weeklyDueDate = addDays(startDate, 2);
+        const tasks = {
+          daysFromPrev: {
+            name: '🏠↻Skipped DaysFromPrev task',
+            dueDate: dateKey(addDays(startDate, 3))
+          },
+          weekly: {
+            name: '🏠↻Skipped Weekly task',
+            dueDate: dateKey(weeklyDueDate)
+          },
+          monthly: {
+            name: '🏠↻Skipped Monthly task',
+            dueDate: '2026-01-05'
+          },
+          yearly: {
+            name: '🏠↻Skipped Yearly task',
+            dueDate: '2026-01-06'
+          }
+        };
+
+        report.closedAfter = dateKey(startDate);
+        report.reopenedOn = dateKey(reopenDate);
+        report.expectedTasks = clone(tasks);
+
+        const stored = window.ensureStorageInitialized() || {};
+        originalSettings = clone(stored.settings || {});
+        stored.task_todo = {};
+        stored.task_template = {};
+        stored.settings = stored.settings || {};
+        stored.settings.CURDATE = { val: dateKey(startDate) };
+        localStorage.setItem('db', JSON.stringify(stored));
+
+        window.CurrentDate = startDate;
+        window.addTemplate(tasks.daysFromPrev.name, 3, 'DaysFromPrev', dateKey(startDate));
+        window.addTemplate(
+          tasks.weekly.name,
+          weeklyDueDate.getDay() + 1,
+          'Weekly',
+          dateKey(startDate)
+        );
+        window.addTemplate(tasks.monthly.name, 5, 'Monthly', dateKey(startDate));
+        window.addTemplate(tasks.yearly.name, 106, 'Yearly', dateKey(startDate));
+
+        report.beforeReopen = clone(window.loadFromLocalStorage());
+
+        window.CurrentDate = reopenDate;
+        const catchUpResult = window.checkDailyTrigger();
+        const afterCatchUp = window.loadFromLocalStorage() || {};
+        report.catchUpResult = clone(catchUpResult);
+        report.afterCatchUp = clone(afterCatchUp);
+
+        const expectedProcessedDates = [];
+        for (let offset = 1; offset <= 7; offset++) {
+          expectedProcessedDates.push(dateKey(addDays(startDate, offset)));
+        }
+        assertResult(
+          'all_missed_dates_processed',
+          expectedProcessedDates,
+          catchUpResult.processedDates
+        );
+
+        Object.keys(tasks).forEach(function (taskType) {
+          const taskDefinition = tasks[taskType];
+          const storedTask = afterCatchUp.task_todo
+            ? afterCatchUp.task_todo[taskDefinition.name]
+            : null;
+          assertResult(
+            taskType + '_task_recovered',
+            true,
+            Boolean(storedTask)
+          );
+          assertResult(
+            taskType + '_correct_due_date',
+            taskDefinition.dueDate,
+            storedTask ? storedTask.lud : null
+          );
+        });
+
+        const insertionDates = {};
+        (catchUpResult.dailyResults || []).forEach(function (dayResult) {
+          (dayResult.insertedTaskNames || []).forEach(function (taskName) {
+            insertionDates[taskName] = dayResult.date;
+          });
+        });
+        report.actualInsertionDates = insertionDates;
+
+        Object.keys(tasks).forEach(function (taskType) {
+          const taskDefinition = tasks[taskType];
+          assertResult(
+            taskType + '_inserted_on_missed_due_date',
+            taskDefinition.dueDate,
+            insertionDates[taskDefinition.name] || null
+          );
+        });
+
+        const todoCountBeforeSecondCheck = Object.keys(afterCatchUp.task_todo || {}).length;
+        const secondCheckResult = window.checkDailyTrigger();
+        const afterSecondCheck = window.loadFromLocalStorage() || {};
+        report.secondSameDayCheck = clone(secondCheckResult);
+        assertResult(
+          'second_check_skipped',
+          'already_rescheduled',
+          secondCheckResult.reason
+        );
+        assertResult(
+          'no_duplicate_tasks',
+          todoCountBeforeSecondCheck,
+          Object.keys(afterSecondCheck.task_todo || {}).length
+        );
+
+        const passedAssertions = report.assertions.filter(function (item) {
+          return item.passed;
+        }).length;
+        report.summary = {
+          assertions: report.assertions.length,
+          passed: passedAssertions,
+          failed: report.assertions.length - passedAssertions,
+          result: passedAssertions === report.assertions.length ? 'PASS' : 'FAIL'
+        };
+        updateView(
+          'Test 5 completed: ' + report.summary.result + '. Migration is required to restore tasks.',
+          report
+        );
+      } catch (error) {
+        report.error = {
+          name: error.name || 'Error',
+          message: error.message || String(error),
+          stack: error.stack || null
+        };
+        updateView('Test 5 failed to execute: ' + report.error.message, report);
+      } finally {
+        delete window.CurrentDate;
+
+        try {
+          const finalData = window.loadFromLocalStorage() || {};
+          finalData.settings = originalSettings || {};
+          localStorage.setItem('db', JSON.stringify(finalData));
+        } catch (restoreError) {
+          report.settingsRestoreError = restoreError.message || String(restoreError);
+          updateView('Test completed, but restoring settings failed.', report);
+        }
+
+        button.disabled = false;
       }
     }
 
@@ -1227,10 +2317,15 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('back-to-tasks-button').addEventListener('click', function () {
+        window.location.href = 'index.html';
+      });
       document.getElementById('save-data-button').addEventListener('click', handleSave);
       document.getElementById('read-data-button').addEventListener('click', handleLoad);
       document.getElementById('clear-data-button').addEventListener('click', handleClear);
       document.getElementById('task-template-button').addEventListener('click', handleTaskTemplateOnly);
+      document.getElementById('task-items-ui-button').addEventListener('click', handleTaskItemsForUi);
+      document.getElementById('template-info-ui-button').addEventListener('click', handleTaskTemplatesInfo);
       document.getElementById('save-date-button').addEventListener('click', handleSaveDate);
       document.getElementById('read-date-button').addEventListener('click', handleReadDate);
       document.getElementById('check-daily-trigger-button').addEventListener('click', handleCheckDailyTrigger);
@@ -1239,6 +2334,11 @@
       document.getElementById('delete-task-button').addEventListener('click', handleDeleteTask);
       document.getElementById('delete-template-button').addEventListener('click', handleDeleteTemplate);
       document.getElementById('retrieve-api-todo-button').addEventListener('click', handleRetrieveApiTodo);
+      document.getElementById('run-repeat-five-day-test-button').addEventListener('click', handleRepeatFiveDayTest);
+      document.getElementById('run-weekly-test-button').addEventListener('click', handleWeeklyTaskTest);
+      document.getElementById('run-monthly-test-button').addEventListener('click', handleMonthlyTaskTest);
+      document.getElementById('run-yearly-test-button').addEventListener('click', handleYearlyTaskTest);
+      document.getElementById('run-skipped-days-test-button').addEventListener('click', handleSkippedDaysTest);
     });
   </script>
   <script>
