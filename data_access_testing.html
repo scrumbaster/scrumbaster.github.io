@@ -36,6 +36,7 @@
   <button id="run-yearly-test-button" type="button">Run Test 4: Yearly Task</button>
   <button id="run-skipped-days-test-button" type="button">Run Test 5: Skipped Days</button>
   <button id="download-data-button" type="button">Download local storage as data.js</button>
+  <button id="upload-data-button" type="button">Restore local storage from data.js</button>
 
   <p id="status">No action taken yet.</p>
   <pre id="output"></pre>
@@ -2344,17 +2345,7 @@
   <script>
     function handleDownloadLocalStorage() {
       try {
-        const dataToDownload = window.getLocalStorageDataForDownload();
-        const content = 'window.data = ' + JSON.stringify(dataToDownload, null, 2) + ';\n';
-        const blob = new Blob([content], { type: 'application/javascript' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'data.js';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        const dataToDownload = window.downloadLocalStorageAsDataJs();
         if (typeof window.updateView === 'function') {
           window.updateView('Downloaded local storage data as data.js.', dataToDownload);
         }
@@ -2365,10 +2356,31 @@
       }
     }
 
+    function handleUploadLocalStorage() {
+      window.uploadLocalStorageFromDataJs()
+        .then(function (result) {
+          if (result.cancelled) {
+            return;
+          }
+          if (typeof window.updateView === 'function') {
+            window.updateView('Restored local storage from ' + result.fileName + '.', result.data);
+          }
+        })
+        .catch(function (error) {
+          if (typeof window.updateView === 'function') {
+            window.updateView('Error restoring data: ' + error.message, '');
+          }
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
       const downloadButton = document.getElementById('download-data-button');
       if (downloadButton) {
         downloadButton.addEventListener('click', handleDownloadLocalStorage);
+      }
+      const uploadButton = document.getElementById('upload-data-button');
+      if (uploadButton) {
+        uploadButton.addEventListener('click', handleUploadLocalStorage);
       }
     });
   </script>

@@ -292,6 +292,139 @@
     return sourceData || {};
   }
 
+  function downloadLocalStorageAsDataJs() {
+    const dataToDownload = getLocalStorageDataForDownload();
+    const content = "window.data = " + JSON.stringify(dataToDownload, null, 2) + ";\n";
+    const blob = new Blob([content], { type: "application/javascript" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "data.js";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    return dataToDownload;
+  }
+
+  function stripTrailingCommas(jsonText) {
+    let result = "";
+    let inString = false;
+    let escaped = false;
+
+    for (let i = 0; i < jsonText.length; i++) {
+      const char = jsonText.charAt(i);
+
+      if (inString) {
+        result += char;
+        if (escaped) {
+          escaped = false;
+        } else if (char === "\\") {
+          escaped = true;
+        } else if (char === "\"") {
+          inString = false;
+        }
+        continue;
+      }
+
+      if (char === "\"") {
+        inString = true;
+        result += char;
+        continue;
+      }
+
+      if (char === ",") {
+        let nextIndex = i + 1;
+        while (/\s/.test(jsonText.charAt(nextIndex))) {
+          nextIndex++;
+        }
+        if (jsonText.charAt(nextIndex) === "}" || jsonText.charAt(nextIndex) === "]") {
+          continue;
+        }
+      }
+
+      result += char;
+    }
+
+    return result;
+  }
+
+  function parseDataJsContent(content) {
+    let jsonText = (content || "").trim();
+    const assignmentPatterns = [
+      /^window\.data\s*=\s*/i,
+      /^globalThis\.data\s*=\s*/i,
+      /^var\s+data\s*=\s*/i,
+      /^let\s+data\s*=\s*/i,
+      /^const\s+data\s*=\s*/i,
+      /^data\s*=\s*/i
+    ];
+
+    for (let i = 0; i < assignmentPatterns.length; i++) {
+      if (assignmentPatterns[i].test(jsonText)) {
+        jsonText = jsonText.replace(assignmentPatterns[i], "");
+        break;
+      }
+    }
+
+    jsonText = jsonText.replace(/;\s*$/, "");
+    return JSON.parse(stripTrailingCommas(jsonText));
+  }
+
+  function uploadLocalStorageFromDataJs() {
+    if (!global.localStorage) {
+      return Promise.reject(new Error("Local storage is not available in this browser."));
+    }
+
+    if (!global.FileReader) {
+      return Promise.reject(new Error("File reading is not available in this browser."));
+    }
+
+    return new Promise(function (resolve, reject) {
+      const input = document.createElement("input");
+
+      input.type = "file";
+      input.accept = ".js,application/javascript,text/javascript";
+      input.style.display = "none";
+
+      input.addEventListener("change", function () {
+        const file = input.files && input.files[0];
+
+        document.body.removeChild(input);
+
+        if (!file) {
+          resolve({ success: false, cancelled: true });
+          return;
+        }
+
+        if (!/^data(?:\s*\(\d+\))?\.js$/i.test(file.name)) {
+          reject(new Error("Please select data.js or a downloaded copy such as data(1).js."));
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function () {
+          try {
+            const importedData = parseDataJsContent(reader.result);
+            global.localStorage.setItem(STORAGE_KEY, JSON.stringify(importedData));
+            resolve({ success: true, key: STORAGE_KEY, fileName: file.name, data: importedData });
+          } catch (error) {
+            reject(new Error("Selected file is not a valid data.js file: " + error.message));
+          }
+        };
+        reader.onerror = function () {
+          reject(new Error("Could not read selected file."));
+        };
+        reader.readAsText(file);
+      });
+
+      document.body.appendChild(input);
+      input.click();
+    });
+  }
+
   function ensureStorageInitialized() {
     const stored = loadFromLocalStorage();
     if (stored !== null) {
@@ -515,7 +648,9 @@
     addTemplate,
     deleteTask,
     deleteTemplate,
-    getLocalStorageDataForDownload
+    getLocalStorageDataForDownload,
+    downloadLocalStorageAsDataJs,
+    uploadLocalStorageFromDataJs
   };
 
   global.saveDataToLocalStorage = saveDataToLocalStorage;
@@ -538,4 +673,6 @@
   global.deleteTask = deleteTask;
   global.deleteTemplate = deleteTemplate;
   global.getLocalStorageDataForDownload = getLocalStorageDataForDownload;
+  global.downloadLocalStorageAsDataJs = downloadLocalStorageAsDataJs;
+  global.uploadLocalStorageFromDataJs = uploadLocalStorageFromDataJs;
 })(window);
