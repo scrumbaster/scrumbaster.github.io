@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>MyTasks</title>
     <link rel="shortcut icon" type="image/png" href="static/favicon-32x32.png"/>
     <link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
@@ -343,6 +344,7 @@
     </style>
     <script src="data.js"></script>
     <script src="data_access.js?v=20260705-6"></script>
+    <script src="risks.js"></script>
 </head>
 <body onload="init_local_data_and_refresh()">
 
@@ -791,117 +793,49 @@
         <!--==============================================================================================================================================-->
         <div id="tree" style="max-width:600px;border:solid; border-radius: 10px; border-color:#546692; border-width:5px; display:none">
 
-            <ul id="risks" style="padding:0px;">
-                <li>
-                    <input type="radio" name="tree" onclick="caret_click(this)" /><span class="caret" onclick="caret_click(this)">🩺Health</span>
-                    <ul class="nested">
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Weight</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Vacations</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Remove moles from balls</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Annual check up</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">B12</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Health problems</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Eating</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Exercising</span></li>
-                        <li>
-                            <input type="radio" name="tree" onclick="caret_click(this)" /><span class="caret" onclick="caret_click(this)">🦷Dental</span>
-                            <ul class="nested">
-                                <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Dental cleaning</span></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <input type="radio" name="tree" onclick="caret_click(this)" /><span class="caret" onclick="caret_click(this)">💰Finance</span>
-                                                                                  <ul class="nested">
-                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Property taxes</span></li>
-                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Tax return</span></li>
-                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Financial literacy</span></li>
-                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Market monitoring</span></li>
-                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Open or close accounts</span></li>
-                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Credit score</span></li>
-                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Insurance</span></li>
-                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Investments</span></li>
-                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Trading Stratagies</span></li>
-                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Sell gold and silver</span></li>
-                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">FSA reimburcement</span></li>
-                                                                                      <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Long termn care insurance</span></li>
-                                                                                  </ul>
-                </li>
-                <li>
-                    <input type="radio" name="tree" onclick="caret_click(this)" /><span class="caret" onclick="caret_click(this)">🚙Cars Care</span>
-                    <ul class="nested">
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Check liquids</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Clean the windshild and mirrors</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Bateries</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Wipers</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Filters</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Oil change</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Breaks</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Tires</span></li>
-                    </ul>
-                </li>
-                <li>
-                    <input type="radio" name="tree" onclick="caret_click(this)" /><span class="caret" onclick="caret_click(this)">🏠Home Care</span>
-                    <ul class="nested">
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Lown mover maintanance</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Snow blower maintanance</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Heating maintenance</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Gutters</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Home improvments</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Termite protection</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Ants Protection</span></li>
-                    </ul>
-                </li>
-                <li>
-                    <input type="radio" name="tree" onclick="caret_click(this)" /><span class="caret" onclick="caret_click(this)">👔Work</span>
-                    <ul class="nested">
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Updating LinkedIn Profile and Resume</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Build-up skill set for the next job</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Building relationships with people</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Cloud learning</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Python learning</span></li>
-                    </ul>
-                </li>
-                <li>
-                    <input type="radio" name="tree" onclick="caret_click(this)" /><span class="caret" onclick="caret_click(this)">🦁Leo</span>
-                    <ul class="nested">
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Leo's credit cards and other payments</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Leo's medical needs</span></li>
-                    </ul>
-                </li>
-                <li>
-                    <input type="radio" name="tree" onclick="caret_click(this)" /><span class="caret" onclick="caret_click(this)">🤼Relationships</span>
-                        <ul class="nested">
-                            <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Igor Gerasin</span></li>
-                            <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Vlad</span></li>
-                            <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Masha</span></li>
-                            <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Sasha</span></li>
-                            <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Mario</span></li>
-                            <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Igor Raspin</span></li>
-                            <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Vartan</span></li>
-                            <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Kostya</span></li>
-                        </ul>
-                </li>
-                <li>
-                    <input type="radio" name="tree" onclick="caret_click(this)" /><span class="caret" onclick="caret_click(this)">🏖️Retirement</span>
-                    <ul class="nested">
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Learn cooking</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Reparing stuff to save money</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Audiobooks</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Learn fixing shoes</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Catching small game</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Biking</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Gardening</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Fishing</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Organize Photos</span></li>
-                        <li><input type="radio" name="tree" onclick="caret_click(this)" /><span class="noncaret" onclick="caret_click(this)">Compensate executive function</span></li>
-                    </ul>
-                </li>
-            </ul>
+            <ul id="risks" style="padding:0px;"></ul>
 
             <script>
                 var tree_div = document.getElementById("tree");
+                function renderRiskTree() {
+                    var risks_el = document.getElementById("risks");
+                    var risks = window.risks || [];
+                    risks_el.replaceChildren();
+
+                    function buildRiskItem(risk) {
+                        var li = document.createElement("li");
+                        var input = document.createElement("input");
+                        var span = document.createElement("span");
+                        var children = risk.children || [];
+
+                        input.type = "radio";
+                        input.name = "tree";
+                        input.onclick = function () { caret_click(this); };
+
+                        span.className = children.length > 0 ? "caret" : "noncaret";
+                        span.textContent = risk.name;
+                        span.onclick = function () { caret_click(this); };
+
+                        li.appendChild(input);
+                        li.appendChild(span);
+
+                        if (children.length > 0) {
+                            var ul = document.createElement("ul");
+                            ul.className = "nested";
+                            for (var i = 0; i < children.length; i++) {
+                                ul.appendChild(buildRiskItem(children[i]));
+                            }
+                            li.appendChild(ul);
+                        }
+
+                        return li;
+                    }
+
+                    for (var i = 0; i < risks.length; i++) {
+                        risks_el.appendChild(buildRiskItem(risks[i]));
+                    }
+                }
+
                 function caret_click(caret) {
                     if (caret.parentElement.querySelector(".nested") != null) {
                         var parent = caret.parentElement;
@@ -926,6 +860,7 @@
 
                     }
                 }
+                renderRiskTree();
             </script>
 
         </div>
