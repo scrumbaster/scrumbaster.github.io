@@ -292,21 +292,71 @@
     return sourceData || {};
   }
 
+  function isIosSafari() {
+    const userAgent = global.navigator && global.navigator.userAgent ? global.navigator.userAgent : "";
+    const platform = global.navigator && global.navigator.platform ? global.navigator.platform : "";
+    const isIosDevice = /iP(ad|hone|od)/.test(userAgent)
+      || (platform === "MacIntel" && global.navigator && global.navigator.maxTouchPoints > 1);
+    return isIosDevice && /Safari/.test(userAgent) && !/CriOS|FxiOS|EdgiOS/.test(userAgent);
+  }
+
+  function openTextFallback(content) {
+    const openedWindow = global.open("", "_blank");
+    if (!openedWindow) {
+      throw new Error("Popup was blocked. Allow popups or use Safari share/save options.");
+    }
+
+    openedWindow.document.open();
+    openedWindow.document.write("<!DOCTYPE html><html><head><title>data.js</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head><body><pre style=\"white-space:pre-wrap;word-break:break-word;\"></pre></body></html>");
+    openedWindow.document.close();
+    openedWindow.document.querySelector("pre").textContent = content;
+  }
+
   function downloadLocalStorageAsDataJs() {
     const dataToDownload = getLocalStorageDataForDownload();
     const content = "window.data = " + JSON.stringify(dataToDownload, null, 2) + ";\n";
     const blob = new Blob([content], { type: "application/javascript" });
+
+    if (isIosSafari()) {
+      if (global.navigator
+        && typeof global.navigator.canShare === "function"
+        && typeof global.navigator.share === "function"
+        && typeof global.File === "function") {
+        const file = new File([blob], "data.js", { type: "application/javascript" });
+        try {
+          if (global.navigator.canShare({ files: [file] })) {
+            return global.navigator.share({
+              files: [file],
+              title: "data.js"
+            }).then(function () {
+              return dataToDownload;
+            }).catch(function () {
+              openTextFallback(content);
+              return dataToDownload;
+            });
+          }
+        } catch (error) {
+          openTextFallback(content);
+          return Promise.resolve(dataToDownload);
+        }
+      }
+
+      openTextFallback(content);
+      return Promise.resolve(dataToDownload);
+    }
+
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-
     link.href = url;
     link.download = "data.js";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    global.setTimeout(function () {
+      URL.revokeObjectURL(url);
+    }, 1000);
 
-    return dataToDownload;
+    return Promise.resolve(dataToDownload);
   }
 
   function stripTrailingCommas(jsonText) {
@@ -386,8 +436,14 @@
       const input = document.createElement("input");
 
       input.type = "file";
-      input.accept = ".js,application/javascript,text/javascript";
-      input.style.display = "none";
+      input.accept = ".js,text/javascript,application/javascript,text/plain,application/json";
+      input.style.position = "fixed";
+      input.style.left = "0";
+      input.style.top = "0";
+      input.style.width = "1px";
+      input.style.height = "1px";
+      input.style.opacity = "0";
+      input.style.pointerEvents = "none";
 
       input.addEventListener("change", function () {
         const file = input.files && input.files[0];

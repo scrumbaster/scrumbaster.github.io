@@ -2344,16 +2344,17 @@
   </script>
   <script>
     function handleDownloadLocalStorage() {
-      try {
-        const dataToDownload = window.downloadLocalStorageAsDataJs();
-        if (typeof window.updateView === 'function') {
-          window.updateView('Downloaded local storage data as data.js.', dataToDownload);
-        }
-      } catch (error) {
-        if (typeof window.updateView === 'function') {
-          window.updateView('Error downloading data: ' + error.message, '');
-        }
-      }
+      window.downloadLocalStorageAsDataJs()
+        .then(function (dataToDownload) {
+          if (typeof window.updateView === 'function') {
+            window.updateView('Downloaded local storage data as data.js.', dataToDownload);
+          }
+        })
+        .catch(function (error) {
+          if (typeof window.updateView === 'function') {
+            window.updateView('Error downloading data: ' + error.message, '');
+          }
+        });
     }
 
     function handleUploadLocalStorage() {
