@@ -345,6 +345,15 @@
     <script src="data.js"></script>
     <script src="data_access.js?v=20260705-6"></script>
     <script src="risks.js"></script>
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function () {
+                navigator.serviceWorker.register("service-worker.js").catch(function (error) {
+                    console.error("Service worker registration failed:", error);
+                });
+            });
+        }
+    </script>
 </head>
 <body onload="init_local_data_and_refresh()">
 

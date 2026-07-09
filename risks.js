@@ -4,7 +4,6 @@ window.risks = [
     "children": [
       { "name": "Weight" },
       { "name": "Vacations" },
-      { "name": "Remove moles from balls" },
       { "name": "Annual check up" },
       { "name": "B12" },
       { "name": "Health problems" },
