@@ -17,6 +17,7 @@
   <button id="save-data-button" type="button">Save data.js to local storage</button>
   <button id="read-data-button" type="button">Read local storage and display</button>
   <button id="clear-data-button" type="button">Clear local storage</button>
+  <button id="clear-cache-button" type="button">Clear app cache</button>
   <button id="task-template-button" type="button">Return task_template only</button>
   <button id="task-items-ui-button" type="button">Test getTaskItemsForUi</button>
   <button id="template-info-ui-button" type="button">Test getTaskTemplatesInfo</button>
@@ -922,6 +923,73 @@
         updateView('Cleared localStorage entry for key "db".', 'Local storage cleared.');
       } catch (error) {
         updateView('Error clearing storage: ' + error.message, '');
+      }
+    }
+
+    async function handleClearAppCache() {
+      const report = {
+        cacheStorageSupported: 'caches' in window,
+        serviceWorkerSupported: 'serviceWorker' in navigator,
+        deletedCaches: [],
+        serviceWorkers: [],
+        refreshedFiles: [],
+        note: 'Local storage was not changed.'
+      };
+
+      try {
+        if (report.cacheStorageSupported) {
+          const cacheNames = await caches.keys();
+          report.cacheNamesBeforeDelete = cacheNames;
+
+          for (const cacheName of cacheNames) {
+            const deleted = await caches.delete(cacheName);
+            report.deletedCaches.push({ cacheName: cacheName, deleted: deleted });
+          }
+        }
+
+        if (report.serviceWorkerSupported) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          report.serviceWorkerRegistrationsBeforeUnregister = registrations.length;
+
+          for (const registration of registrations) {
+            const scope = registration.scope;
+            const unregistered = await registration.unregister();
+            report.serviceWorkers.push({ scope: scope, unregistered: unregistered });
+          }
+        }
+
+        if (navigator.onLine) {
+          const filesToRefresh = ['index.html', 'risks.js', 'data_access.js?v=20260705-6'];
+          for (const fileUrl of filesToRefresh) {
+            try {
+              const response = await fetch(fileUrl, { cache: 'reload' });
+              report.refreshedFiles.push({
+                url: fileUrl,
+                ok: response.ok,
+                status: response.status
+              });
+            } catch (refreshError) {
+              report.refreshedFiles.push({
+                url: fileUrl,
+                ok: false,
+                error: refreshError.message || String(refreshError)
+              });
+            }
+          }
+        } else {
+          report.refreshSkipped = 'Browser reports offline.';
+        }
+
+        updateView(
+          'Cleared app cache. Open index.html online to pull the latest app files from the server.',
+          report
+        );
+      } catch (error) {
+        report.error = {
+          name: error.name || 'Error',
+          message: error.message || String(error)
+        };
+        updateView('Error clearing app cache: ' + report.error.message, report);
       }
     }
 
@@ -2324,6 +2392,7 @@
       document.getElementById('save-data-button').addEventListener('click', handleSave);
       document.getElementById('read-data-button').addEventListener('click', handleLoad);
       document.getElementById('clear-data-button').addEventListener('click', handleClear);
+      document.getElementById('clear-cache-button').addEventListener('click', handleClearAppCache);
       document.getElementById('task-template-button').addEventListener('click', handleTaskTemplateOnly);
       document.getElementById('task-items-ui-button').addEventListener('click', handleTaskItemsForUi);
       document.getElementById('template-info-ui-button').addEventListener('click', handleTaskTemplatesInfo);
