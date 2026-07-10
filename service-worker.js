@@ -1,10 +1,12 @@
-const CACHE_NAME = "mytasks-offline-v1";
+const CACHE_NAME = "mytasks-offline-v2";
 
 const OFFLINE_ASSETS = [
   "./",
   "./index.html",
+  "./data_access_testing.html",
+  "./data_access_testing.html?v=20260710-1",
   "./data.js",
-  "./data_access.js?v=20260705-6",
+  "./data_access.js?v=20260710-1",
   "./risks.js",
   "./static/site.webmanifest",
   "./static/apple-touch-icon.png",
@@ -59,12 +61,24 @@ self.addEventListener("fetch", function (event) {
           if (response.ok) {
             const responseCopy = response.clone();
             caches.open(CACHE_NAME).then(function (cache) {
+              if (requestUrl.pathname.endsWith("/data_access_testing.html")) {
+                return cache.put(request, responseCopy);
+              }
               return cache.put("./index.html", responseCopy);
             }).catch(function () {});
           }
           return response;
         })
         .catch(function () {
+          if (requestUrl.pathname.endsWith("/data_access_testing.html")) {
+            return caches.match(request)
+              .then(function (cachedResponse) {
+                return cachedResponse || caches.match("./data_access_testing.html");
+              })
+              .then(function (cachedResponse) {
+                return cachedResponse || caches.match("./index.html");
+              });
+          }
           return caches.match("./index.html");
         })
     );

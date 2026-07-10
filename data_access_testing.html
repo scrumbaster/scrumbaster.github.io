@@ -7,11 +7,13 @@
   <style>
     body { font-family: Arial, sans-serif; margin: 24px; }
     button { margin-right: 8px; padding: 8px 12px; }
+    .page-version { color: #555; font-size: 14px; margin-top: -12px; }
     pre { background: #f5f5f5; padding: 12px; white-space: pre-wrap; word-break: break-word; }
   </style>
 </head>
 <body>
   <h1>Local Storage Test</h1>
+  <p class="page-version">Testing page version: <strong id="testing-page-version">2026.07.10.1</strong></p>
 
   <button id="back-to-tasks-button" type="button">Back to Tasks</button>
   <button id="save-data-button" type="button">Save data.js to local storage</button>
@@ -881,8 +883,12 @@
         </script>
     </div>
   <script src="data.js"></script>
-  <script src="data_access.js?v=20260705-6"></script>
+  <script src="data_access.js?v=20260710-1"></script>
   <script>
+    const TESTING_PAGE_VERSION = '2026.07.10.1';
+    document.title = 'Local Storage Test ' + TESTING_PAGE_VERSION;
+    document.getElementById('testing-page-version').textContent = TESTING_PAGE_VERSION;
+
     function updateView(statusMessage, outputValue) {
       const statusEl = document.getElementById('status');
       const outputEl = document.getElementById('output');
@@ -959,7 +965,7 @@
         }
 
         if (navigator.onLine) {
-          const filesToRefresh = ['index.html', 'risks.js', 'data_access.js?v=20260705-6'];
+          const filesToRefresh = ['index.html', 'risks.js', 'data_access.js?v=20260710-1', 'data_access_testing.html?v=20260710-1'];
           for (const fileUrl of filesToRefresh) {
             try {
               const response = await fetch(fileUrl, { cache: 'reload' });
@@ -1038,7 +1044,7 @@
     function handleCheckDailyTrigger() {
       try {
         const shouldTrigger = window.checkDailyTrigger();
-        const currentDate = window.getCurrentDate().toISOString().slice(0, 10);
+        const currentDate = window.formatDateToString(window.getCurrentDate());
         updateView('Daily trigger check complete.', {
           shouldTrigger: shouldTrigger,
           currentDate: currentDate,
@@ -1064,7 +1070,7 @@
         const taskName = document.getElementById('task-name-input').value;
         const intervalInput = document.getElementById('interval_range');
         const recurrenceInput = document.querySelector('input[name="recuring"]:checked');
-        const currentDate = window.getCurrentDate().toISOString().slice(0, 10);
+        const currentDate = window.formatDateToString(window.getCurrentDate());
         const intervalValue = intervalInput ? intervalInput.value : '';
         const taskType = recurrenceInput ? recurrenceInput.value : '';
         const result = window.addTemplate(taskName, intervalValue, taskType, currentDate);
@@ -1163,7 +1169,7 @@
       }
 
       function dateKey(date) {
-        return date.toISOString().slice(0, 10);
+        return window.formatDateToString(date);
       }
 
       function addDays(date, numberOfDays) {
@@ -1373,7 +1379,7 @@
       }
 
       function dateKey(date) {
-        return date.toISOString().slice(0, 10);
+        return window.formatDateToString(date);
       }
 
       function addDays(date, numberOfDays) {
@@ -1594,7 +1600,7 @@
       }
 
       function dateKey(date) {
-        return date.toISOString().slice(0, 10);
+        return window.formatDateToString(date);
       }
 
       function addDays(date, numberOfDays) {
@@ -1809,7 +1815,7 @@
       }
 
       function dateKey(date) {
-        return date.toISOString().slice(0, 10);
+        return window.formatDateToString(date);
       }
 
       function addDays(date, numberOfDays) {
@@ -2008,7 +2014,7 @@
       }
 
       function dateKey(date) {
-        return date.toISOString().slice(0, 10);
+        return window.formatDateToString(date);
       }
 
       function addDays(date, numberOfDays) {

@@ -343,7 +343,7 @@
         }
     </style>
     <script src="data.js"></script>
-    <script src="data_access.js?v=20260705-6"></script>
+    <script src="data_access.js?v=20260710-1"></script>
     <script src="risks.js"></script>
     <script>
         if ("serviceWorker" in navigator) {
@@ -398,7 +398,7 @@
             const task_readall = '{ "sp_name": "task_update", "params": ["", 0] }';
 
             function open_settings(){
-                window.location.href = "data_access_testing.html?v=20260709-1";
+                window.location.href = "data_access_testing.html?v=20260710-1";
             }
 
             function del_task2(del_button) {
@@ -1719,7 +1719,7 @@
                     task_name = task_name_recurrence_dlg.innerText;
                     try {
                         if (window.addTemplate) {
-                            window.addTemplate(task_name, values[0], task_type, window.getCurrentDate().toISOString().slice(0, 10));
+                            window.addTemplate(task_name, values[0], task_type, window.formatDateToString(window.getCurrentDate()));
                             confirm_recurrence_no();
                         } else {
                             alert('Local data layer unavailable.');

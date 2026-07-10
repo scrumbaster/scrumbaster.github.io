@@ -100,7 +100,15 @@
   }
 
   function formatDateToString(dateValue) {
-    return new Date(dateValue).toISOString().slice(0, 10);
+    if (typeof dateValue === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+      return dateValue;
+    }
+
+    const date = new Date(dateValue);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return year + "-" + month + "-" + day;
   }
 
   function getDaysDifference(startDate, endDate) {
@@ -139,14 +147,9 @@
     const now = getCurrentDate();
     const todayString = formatDateToString(now);
     const storedDate = stored.settings.CURDATE && stored.settings.CURDATE.val ? stored.settings.CURDATE.val : null;
-    const currentHour = now.getHours();
 
     if (storedDate === todayString) {
       return { success: true, skipped: true, reason: "already_rescheduled", date: todayString };
-    }
-
-    if (currentHour < 6) {
-      return { success: true, skipped: true, reason: "before_6am", date: todayString };
     }
 
     const updatedTaskNames = [];
@@ -278,7 +281,7 @@
 
   function checkDailyTrigger() {
     // taskReschedule performs the once-per-day check itself. Calling it on
-    // every page load also allows a page opened before 6am to try again later.
+    // every page load allows the app to reschedule on the first open after midnight.
     return taskReschedule();
   }
 
@@ -549,7 +552,7 @@
       stored.task_todo = {};
     }
 
-    const today = getCurrentDate().toISOString().slice(0, 10);
+    const today = formatDateToString(getCurrentDate());
     stored.task_todo[taskName] = Object.assign({}, stored.task_todo[taskName] || { lud: today, tc: 0 }, {
       lud: today,
       tc: Number(completionValue)
@@ -573,7 +576,7 @@
       stored.task_todo = {};
     }
 
-    const today = getCurrentDate().toISOString().slice(0, 10);
+    const today = formatDateToString(getCurrentDate());
     stored.task_todo[taskName] = { lud: today, tc: 0 };
 
     if (!global.localStorage) {
@@ -687,6 +690,7 @@
   global.DataAccess = {
     STORAGE_KEY,
     getCurrentDate,
+    formatDateToString,
     saveDataToLocalStorage,
     loadFromLocalStorage,
     clearLocalStorage,
@@ -711,6 +715,7 @@
 
   global.saveDataToLocalStorage = saveDataToLocalStorage;
   global.getCurrentDate = getCurrentDate;
+  global.formatDateToString = formatDateToString;
   global.loadFromLocalStorage = loadFromLocalStorage;
   global.clearLocalStorage = clearLocalStorage;
   global.getTaskTemplateOnly = getTaskTemplateOnly;
